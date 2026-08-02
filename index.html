@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vulnerability Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #f0f2f8;
+      --bg2:         #e8eaf2;
+      --surface:     #ffffff;
+      --surface2:    #f7f8fc;
+      --border:      #e4e6ef;
+      --border2:     #eef0f8;
+      --text:        #111827;
+      --text2:       #374151;
+      --muted:       #6b7280;
+      --muted2:      #9ca3af;
+      --accent:      #6366f1;
+      --accent2:     #4f46e5;
+      --glow:        rgba(99,102,241,0.12);
+      --shadow:      0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md:   0 4px 20px rgba(0,0,0,0.08);
+      --radius:      12px;
+      --t:           0.2s ease;
+
+      --c-c: #f43f5e; --c-cbg: #fff1f2; --c-cfg: #991b1b; --c-cbr: #fecdd3;
+      --c-h: #f97316; --c-hbg: #fff7ed; --c-hfg: #92400e; --c-hbr: #fed7aa;
+      --c-m: #eab308; --c-mbg: #fefce8; --c-mfg: #854d0e; --c-mbr: #fef08a;
+      --c-l: #22c55e; --c-lbg: #f0fdf4; --c-lfg: #166534; --c-lbr: #bbf7d0;
+      --c-u: #94a3b8; --c-ubg: #f8fafc; --c-ufg: #475569; --c-ubr: #e2e8f0;
+    }
+    [data-theme="dark"] {
+      --bg:        #0c0e14; --bg2:      #080a0d;
+      --surface:   #13151f; --surface2: #191c28;
+      --border:    #23273a; --border2:  #1d2030;
+      --text:      #f0f2fa; --text2:    #c8cee0;
+      --muted:     #8890aa; --muted2:   #565e78;
+      --accent:    #818cf8; --accent2:  #a5b4fc;
+      --glow:      rgba(129,140,248,0.1);
+      --shadow:    0 1px 3px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 24px rgba(0,0,0,0.5);
+
+      --c-c:#f43f5e; --c-cbg:rgba(244,63,94,.12);  --c-cfg:#fca5a5; --c-cbr:rgba(244,63,94,.22);
+      --c-h:#f97316; --c-hbg:rgba(249,115,22,.12); --c-hfg:#fdba74; --c-hbr:rgba(249,115,22,.22);
+      --c-m:#eab308; --c-mbg:rgba(234,179,8,.12);  --c-mfg:#fde047; --c-mbr:rgba(234,179,8,.22);
+      --c-l:#22c55e; --c-lbg:rgba(34,197,94,.12);  --c-lfg:#86efac; --c-lbr:rgba(34,197,94,.22);
+      --c-u:#64748b; --c-ubg:rgba(148,163,184,.1); --c-ufg:#94a3b8; --c-ubr:rgba(148,163,184,.15);
+    }
+
+    body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; transition:background var(--t),color var(--t); -webkit-font-smoothing:antialiased; }
+
+    /* ── Header ── */
+    header { background:var(--surface); border-bottom:1px solid var(--border); padding:0 32px; height:60px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:200; box-shadow:var(--shadow); transition:background var(--t),border-color var(--t); }
+    .logo { display:flex; align-items:center; gap:10px; }
+    .logo-icon { width:30px; height:30px; background:linear-gradient(135deg,var(--accent),#a78bfa); border-radius:8px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px var(--glow); }
+    .logo-icon svg { width:16px; height:16px; fill:none; stroke:#fff; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+    .logo-name { font-size:14px; font-weight:700; letter-spacing:-.3px; }
+    .logo-sub  { font-size:10px; color:var(--muted); letter-spacing:.2px; }
+    .hdr-right { display:flex; align-items:center; gap:8px; }
+    .updated { font-size:11.5px; color:var(--muted); background:var(--surface2); border:1px solid var(--border); padding:4px 10px; border-radius:20px; }
+    .icon-btn { width:34px; height:34px; border:1px solid var(--border); background:var(--surface2); border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:background var(--t),transform .15s; color:var(--muted); }
+    .icon-btn:hover { background:var(--bg2); transform:scale(1.05); }
+    .icon-btn svg { width:15px; height:15px; stroke:currentColor; stroke-width:2; fill:none; }
+    .icon-sun { display:none; } .icon-moon { display:block; }
+    [data-theme="dark"] .icon-sun { display:block; } [data-theme="dark"] .icon-moon { display:none; }
+    .refresh-btn { display:flex; align-items:center; gap:6px; padding:0 14px; height:34px; border:1px solid var(--border); background:var(--surface2); border-radius:8px; font-size:12.5px; font-weight:500; color:var(--text2); cursor:pointer; transition:background var(--t),transform .15s; }
+    .refresh-btn:hover { background:var(--bg2); transform:translateY(-1px); }
+    .refresh-btn svg { width:13px; height:13px; stroke:var(--accent); stroke-width:2.3; fill:none; }
+    .refresh-btn.spin svg { animation:spin .7s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* ── Layout ── */
+    main { padding:28px 32px 52px; max-width:1500px; margin:0 auto; }
+    .section-title { font-size:11px; font-weight:700; letter-spacing:.7px; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+
+    /* ── Stat cards ── */
+    .stats { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:24px; }
+    .stat { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px 20px; box-shadow:var(--shadow); transition:background var(--t),border-color var(--t),transform .2s,box-shadow .2s; position:relative; overflow:hidden; cursor:default; }
+    .stat:hover { transform:translateY(-2px); box-shadow:var(--shadow-md); }
+    .stat::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; border-radius:0 0 var(--radius) var(--radius); opacity:0; transition:opacity .2s; }
+    .stat:hover::after { opacity:1; }
+    .stat-total::after  { background:linear-gradient(90deg,var(--accent),#a78bfa); }
+    .stat-crit::after   { background:var(--c-c); }
+    .stat-high::after   { background:var(--c-h); }
+    .stat-med::after    { background:var(--c-m); }
+    .stat-low::after    { background:var(--c-l); }
+    .stat-lbl { font-size:10.5px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+    .stat-val { font-size:34px; font-weight:800; letter-spacing:-2px; line-height:1; }
+    .stat-total .stat-val { color:var(--text); }
+    .stat-crit  .stat-val { color:var(--c-c); }
+    .stat-high  .stat-val { color:var(--c-h); }
+    .stat-med   .stat-val { color:var(--c-m); }
+    .stat-low   .stat-val { color:var(--c-l); }
+    .stat-sub { font-size:11px; color:var(--muted2); margin-top:4px; }
+
+    /* ── Charts row ── */
+    .charts-row { display:grid; grid-template-columns:300px 1fr; gap:14px; margin-bottom:24px; }
+    .chart-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow); transition:background var(--t),border-color var(--t); }
+    .chart-title { font-size:13px; font-weight:650; color:var(--text); margin-bottom:16px; }
+    .chart-wrap { position:relative; }
+    .donut-wrap { height:200px; display:flex; align-items:center; justify-content:center; }
+    .bar-wrap { height:200px; }
+
+
+    /* ── Table panel ── */
+    .panel { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); transition:background var(--t),border-color var(--t); }
+    .panel-hdr { padding:14px 18px; border-bottom:1px solid var(--border2); display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; transition:border-color var(--t); }
+    .panel-left { display:flex; align-items:center; gap:10px; }
+    .panel-title { font-size:13.5px; font-weight:650; color:var(--text); }
+    .count-pill { background:var(--bg); border:1px solid var(--border); color:var(--muted); font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; transition:background var(--t),border-color var(--t); }
+    .panel-right { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+
+    .search-wrap { position:relative; }
+    .search-wrap svg { position:absolute; left:9px; top:50%; transform:translateY(-50%); width:13px; height:13px; stroke:var(--muted); stroke-width:2; fill:none; pointer-events:none; }
+    #search { padding:7px 10px 7px 28px; border:1px solid var(--border); background:var(--surface2); border-radius:8px; font-size:12.5px; color:var(--text); outline:none; width:200px; transition:border-color .15s,background var(--t),color var(--t); }
+    #search:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--glow); }
+
+    .fsel { padding:7px 26px 7px 10px; border:1px solid var(--border); background:var(--surface2); border-radius:8px; font-size:12.5px; color:var(--text2); cursor:pointer; outline:none; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 8px center; font-weight:500; transition:border-color .15s,background var(--t),color var(--t); }
+    .fsel:focus { border-color:var(--accent); }
+
+    .export-btn { display:flex; align-items:center; gap:5px; padding:0 12px; height:32px; border:1px solid var(--border); background:var(--surface2); border-radius:8px; font-size:12px; font-weight:600; color:var(--text2); cursor:pointer; transition:background var(--t),border-color .15s; white-space:nowrap; }
+    .export-btn:hover { background:var(--bg2); border-color:var(--muted2); }
+    .export-btn svg { width:12px; height:12px; stroke:var(--accent); stroke-width:2.3; fill:none; }
+
+    /* ── Table ── */
+    table { width:100%; border-collapse:collapse; }
+    thead th { padding:10px 16px; text-align:left; font-size:10.5px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; color:var(--muted); background:var(--surface2); border-bottom:1px solid var(--border2); white-space:nowrap; cursor:pointer; user-select:none; transition:background var(--t),color var(--t); }
+    thead th:hover { color:var(--text); }
+    thead th.sort-asc::after  { content:' ↑'; color:var(--accent); }
+    thead th.sort-desc::after { content:' ↓'; color:var(--accent); }
+    thead th.no-sort { cursor:default; }
+
+    tbody tr { border-bottom:1px solid var(--border2); transition:background .1s; cursor:pointer; }
+    tbody tr:last-child { border-bottom:none; }
+    tbody tr:hover { background:var(--surface2); }
+    tbody tr.expanded { background:var(--surface2); }
+    td { padding:11px 16px; font-size:13px; color:var(--text2); vertical-align:middle; transition:color var(--t); }
+    .cell-title { max-width:340px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--text); font-size:13px; }
+    .cell-path  { font-family:"SF Mono","Fira Code",monospace; font-size:11px; color:var(--muted); max-width:160px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .cell-time  { font-size:11.5px; color:var(--muted2); white-space:nowrap; }
+    .expand-icon { font-size:10px; color:var(--muted2); transition:transform .2s; display:inline-block; margin-right:6px; }
+    tr.expanded .expand-icon { transform:rotate(90deg); }
+
+    /* ── Advisory panel ── */
+    .detail-row { background:var(--bg) !important; cursor:default; }
+    .detail-row:hover { background:var(--bg) !important; }
+    .detail-cell { padding:10px 20px 16px 20px !important; }
+
+    .advisory { background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow:hidden; max-width:1100px; }
+    .advisory-head { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--border2); gap:12px; flex-wrap:wrap; }
+    .advisory-meta { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .advisory-id { font-family:"SF Mono","Fira Code",monospace; font-size:12px; font-weight:700; color:var(--text); }
+    .advisory-links { display:flex; gap:6px; flex-wrap:wrap; }
+    .adv-link { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:6px; font-size:11.5px; font-weight:600; text-decoration:none; border:1px solid var(--border); background:var(--surface2); color:var(--accent); transition:background .15s,border-color .15s; white-space:nowrap; }
+    .adv-link:hover { background:var(--glow); border-color:var(--accent); }
+    .adv-link svg { width:11px; height:11px; stroke:currentColor; stroke-width:2; fill:none; flex-shrink:0; }
+
+    .advisory-body { display:grid; grid-template-columns:1fr 220px; }
+    .advisory-desc { padding:16px; border-right:1px solid var(--border2); }
+    .adv-section { margin-bottom:14px; }
+    .adv-section:last-child { margin-bottom:0; }
+    .adv-section-title { font-size:10px; font-weight:700; letter-spacing:.7px; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+    .adv-section-body { font-size:12.5px; color:var(--text2); line-height:1.65; word-break:break-word; }
+    .adv-section-body code { font-family:"SF Mono","Fira Code",monospace; font-size:11.5px; background:var(--surface2); border:1px solid var(--border); padding:1px 5px; border-radius:4px; color:var(--text); }
+    .adv-section-body pre { background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:10px 12px; font-family:"SF Mono","Fira Code",monospace; font-size:11px; overflow-x:auto; margin-top:6px; color:var(--text2); white-space:pre; }
+
+    .advisory-sidebar { padding:16px; display:flex; flex-direction:column; gap:12px; }
+    .sidebar-item { display:flex; flex-direction:column; gap:3px; }
+    .sidebar-lbl { font-size:10px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:var(--muted); }
+    .sidebar-val { font-size:12.5px; color:var(--text2); font-weight:500; word-break:break-all; }
+    .sidebar-val.mono { font-family:"SF Mono","Fira Code",monospace; font-size:11px; }
+
+    @media(max-width:700px) { .advisory-body { grid-template-columns:1fr; } .advisory-sidebar { border-top:1px solid var(--border2); border-right:none !important; } }
+
+    /* ── Badges ── */
+    .sev { display:inline-flex; align-items:center; gap:5px; padding:3px 8px 3px 6px; border-radius:5px; font-size:11px; font-weight:700; letter-spacing:.2px; border:1px solid transparent; white-space:nowrap; }
+    .sev-dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; }
+    .sev-CRITICAL { background:var(--c-cbg); color:var(--c-cfg); border-color:var(--c-cbr); } .sev-CRITICAL .sev-dot { background:var(--c-c); }
+    .sev-HIGH     { background:var(--c-hbg); color:var(--c-hfg); border-color:var(--c-hbr); } .sev-HIGH     .sev-dot { background:var(--c-h); }
+    .sev-MEDIUM   { background:var(--c-mbg); color:var(--c-mfg); border-color:var(--c-mbr); } .sev-MEDIUM   .sev-dot { background:var(--c-m); }
+    .sev-LOW      { background:var(--c-lbg); color:var(--c-lfg); border-color:var(--c-lbr); } .sev-LOW      .sev-dot { background:var(--c-l); }
+    .sev-UNKNOWN  { background:var(--c-ubg); color:var(--c-ufg); border-color:var(--c-ubr); } .sev-UNKNOWN  .sev-dot { background:var(--c-u); }
+
+    .app-chip  { display:inline-block; padding:3px 8px; border-radius:5px; font-size:11px; font-weight:600; background:var(--glow); color:var(--accent); border:1px solid rgba(99,102,241,.15); white-space:nowrap; }
+    .tool-chip { display:inline-block; padding:3px 7px; border-radius:4px; font-size:10.5px; font-weight:600; background:var(--surface2); color:var(--muted); border:1px solid var(--border); white-space:nowrap; font-family:"SF Mono","Fira Code",monospace; }
+
+    /* ── Pagination ── */
+    .pagination { display:flex; align-items:center; justify-content:space-between; padding:12px 18px; border-top:1px solid var(--border2); flex-wrap:wrap; gap:8px; transition:border-color var(--t); }
+    .page-info { font-size:12px; color:var(--muted); }
+    .page-btns { display:flex; gap:4px; align-items:center; }
+    .pg-btn { min-width:30px; height:30px; border:1px solid var(--border); background:var(--surface2); border-radius:6px; font-size:12px; color:var(--text2); cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0 6px; transition:background var(--t),border-color .15s; font-weight:500; }
+    .pg-btn:hover:not(:disabled) { background:var(--bg2); border-color:var(--muted2); }
+    .pg-btn:disabled { opacity:.4; cursor:default; }
+    .pg-btn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+    .pg-sep { font-size:12px; color:var(--muted2); padding:0 4px; }
+
+    /* ── State rows ── */
+    .state-td { padding:52px 16px !important; text-align:center; cursor:default; }
+    .state-icon { font-size:28px; margin-bottom:8px; }
+    .state-msg  { font-size:13px; font-weight:500; color:var(--muted); }
+    .state-sub  { font-size:11.5px; color:var(--muted2); margin-top:4px; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width:5px; height:5px; }
+    ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+    ::-webkit-scrollbar-thumb:hover { background:var(--muted2); }
+
+    @media(max-width:900px) {
+      header,main { padding-left:16px; padding-right:16px; }
+      .stats { grid-template-columns:repeat(3,1fr); }
+      .charts-row { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 6.5C8 4.57 9.57 3 11.5 3S15 4.57 15 6.5c0 1.38-.78 2.58-1.93 3.18C14.22 10.2 15 11.4 15 12.75 15 14.54 13.43 16 11.5 16S8 14.54 8 12.75"/>
+        <line x1="8" y1="21" x2="15" y2="21"/>
+        <line x1="11.5" y1="16" x2="11.5" y2="21"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-name">Group Trois</div>
+      <div class="logo-sub">Vulnerability Dashboard</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <span class="updated" id="updated">Not yet loaded</span>
+    <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme">
+      <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun"  viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <button class="refresh-btn" id="btn-refresh" onclick="load()">
+      <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
+      Refresh
+    </button>
+  </div>
+</header>
+
+<main>
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat stat-total"><div class="stat-lbl">Total</div><div class="stat-val" id="s-total">—</div><div class="stat-sub">vulnerabilities</div></div>
+    <div class="stat stat-crit"> <div class="stat-lbl">Critical</div><div class="stat-val" id="s-crit">—</div><div class="stat-sub">immediate action</div></div>
+    <div class="stat stat-high"> <div class="stat-lbl">High</div><div class="stat-val" id="s-high">—</div><div class="stat-sub">high priority</div></div>
+    <div class="stat stat-med">  <div class="stat-lbl">Medium</div><div class="stat-val" id="s-med">—</div><div class="stat-sub">moderate risk</div></div>
+    <div class="stat stat-low">  <div class="stat-lbl">Low</div><div class="stat-val" id="s-low">—</div><div class="stat-sub">low risk</div></div>
+  </div>
+
+  <!-- Charts -->
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="chart-title">Severity Distribution</div>
+      <div class="donut-wrap"><canvas id="donut-chart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Findings by App &amp; Severity</div>
+      <div class="bar-wrap"><canvas id="bar-chart"></canvas></div>
+    </div>
+  </div>
+
+
+  <!-- Table -->
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-left">
+        <span class="panel-title">Findings</span>
+        <span class="count-pill" id="count-pill">0</span>
+      </div>
+      <div class="panel-right">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="search" type="text" placeholder="Search issues…" oninput="onFilter()"/>
+        </div>
+        <select class="fsel" id="f-app"  onchange="onFilter()">
+          <option value="">All apps</option>
+          <option value="JuiceShop">JuiceShop</option>
+          <option value="Todolist">Todolist</option>
+        </select>
+        <select class="fsel" id="f-sev"  onchange="onFilter()">
+          <option value="">All severities</option>
+          <option value="CRITICAL">Critical</option>
+          <option value="HIGH">High</option>
+          <option value="MEDIUM">Medium</option>
+          <option value="LOW">Low</option>
+        </select>
+        <select class="fsel" id="f-tool" onchange="onFilter()">
+          <option value="">All tools</option>
+          <option value="Semgrep">Semgrep</option>
+          <option value="Gitleaks">Gitleaks</option>
+          <option value="npm-audit">npm-audit</option>
+          <option value="OWASP-DepCheck">OWASP-DepCheck</option>
+          <option value="Trivy">Trivy</option>
+          <option value="OWASP-ZAP">OWASP-ZAP</option>
+        </select>
+        <button class="export-btn" onclick="exportCSV()">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export CSV
+        </button>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th onclick="sortBy('app')"      id="th-app">App</th>
+          <th onclick="sortBy('severity')" id="th-severity">Severity</th>
+          <th onclick="sortBy('tool')"     id="th-tool">Tool</th>
+          <th class="no-sort">Issue</th>
+          <th class="no-sort">File / Target</th>
+          <th onclick="sortBy('created_at')" id="th-created_at">Detected</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <tr><td class="state-td" colspan="6">
+          <div class="state-icon">⏳</div>
+          <div class="state-msg">Loading findings…</div>
+        </td></tr>
+      </tbody>
+    </table>
+    <div class="pagination" id="pagination" style="display:none"></div>
+  </div>
+</main>
+
+<script>
+const API = 'http://10.97.13.101:3001';
+const PAGE_SIZE = 25;
+
+let allData = [];
+let filtered = [];
+let page = 1;
+let sortCol = 'severity';
+let sortDir = 'asc';
+let expanded = new Set();
+let sevChart = null;
+let appChart = null;
+// ── Theme ──
+const savedTheme = localStorage.getItem('vd-theme') || 'light';
+document.documentElement.setAttribute('data-theme', savedTheme);
+function toggleTheme() {
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('vd-theme', next);
+  renderCharts(allData);
+}
+
+// ── Helpers ──
+function esc(s) { return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function reltime(iso) {
+  if (!iso) return '—';
+  const d = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(d/60000);
+  if (m<1) return 'just now';
+  if (m<60) return m+'m ago';
+  const h = Math.floor(m/60);
+  if (h<24) return h+'h ago';
+  const dy = Math.floor(h/24);
+  if (dy<7) return dy+'d ago';
+  return new Date(iso).toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+}
+function sevOrder(s) { return {CRITICAL:0,HIGH:1,MEDIUM:2,LOW:3,UNKNOWN:4}[s]??5; }
+function chartColors() {
+  const dark = document.documentElement.getAttribute('data-theme')==='dark';
+  return { text: dark?'#8890aa':'#6b7280', grid: dark?'#23273a':'#e4e6ef' };
+}
+
+// ── Load ──
+async function load() {
+  const btn = document.getElementById('btn-refresh');
+  btn.classList.add('spin');
+  try {
+    allData = await fetch(`${API}/vulnerabilities`).then(r=>r.json());
+    document.getElementById('updated').textContent = 'Updated '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    renderStats(allData);
+    renderCharts(allData);
+    onFilter();
+  } catch(e) {
+    allData = [];
+    document.getElementById('tbody').innerHTML = `<tr><td class="state-td" colspan="6">
+      <div class="state-icon">⚠️</div>
+      <div class="state-msg">Cannot connect to backend</div>
+      <div class="state-sub">${API} is unreachable</div>
+    </td></tr>`;
+    document.getElementById('pagination').style.display='none';
+    ['s-total','s-crit','s-high','s-med','s-low'].forEach(id=>document.getElementById(id).textContent='—');
+  }
+  btn.classList.remove('spin');
+}
+
+// ── Stats ──
+function renderStats(data) {
+  document.getElementById('s-total').textContent = data.length;
+  document.getElementById('s-crit').textContent  = data.filter(v=>v.severity==='CRITICAL').length;
+  document.getElementById('s-high').textContent  = data.filter(v=>v.severity==='HIGH').length;
+  document.getElementById('s-med').textContent   = data.filter(v=>v.severity==='MEDIUM').length;
+  document.getElementById('s-low').textContent   = data.filter(v=>v.severity==='LOW').length;
+}
+
+// ── Charts ──
+function renderCharts(data) {
+  const cc = chartColors();
+  const counts = {CRITICAL:0,HIGH:0,MEDIUM:0,LOW:0};
+  data.forEach(v=>{ if(counts[v.severity]!==undefined) counts[v.severity]++; });
+
+  // Donut
+  const dc = document.getElementById('donut-chart').getContext('2d');
+  if (sevChart) sevChart.destroy();
+  sevChart = new Chart(dc, {
+    type:'doughnut',
+    data:{
+      labels:['Critical','High','Medium','Low'],
+      datasets:[{ data:[counts.CRITICAL,counts.HIGH,counts.MEDIUM,counts.LOW],
+        backgroundColor:['#f43f5e','#f97316','#eab308','#22c55e'],
+        borderWidth:0, hoverOffset:4 }]
+    },
+    options:{
+      cutout:'72%', responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{ position:'bottom', labels:{ color:cc.text, padding:14, font:{size:11,weight:'600'}, boxWidth:10, boxHeight:10 } },
+        tooltip:{ callbacks:{ label: ctx => ` ${ctx.label}: ${ctx.parsed} (${Math.round(ctx.parsed/data.length*100||0)}%)` } }
+      }
+    }
+  });
+
+  // Bar — per app stacked
+  const apps = [...new Set(data.map(v=>v.app))];
+  const sevs = ['CRITICAL','HIGH','MEDIUM','LOW'];
+  const colors = { CRITICAL:'#f43f5e', HIGH:'#f97316', MEDIUM:'#eab308', LOW:'#22c55e' };
+  const bc = document.getElementById('bar-chart').getContext('2d');
+  if (appChart) appChart.destroy();
+  appChart = new Chart(bc, {
+    type:'bar',
+    data:{
+      labels:apps,
+      datasets: sevs.map(s=>({
+        label:s,
+        data:apps.map(a=>data.filter(v=>v.app===a&&v.severity===s).length),
+        backgroundColor:colors[s], borderRadius:3, borderSkipped:false
+      }))
+    },
+    options:{
+      indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      scales:{
+        x:{ stacked:true, grid:{color:cc.grid}, ticks:{color:cc.text,font:{size:11}} },
+        y:{ stacked:true, grid:{display:false}, ticks:{color:cc.text,font:{size:12,weight:'600'}} }
+      },
+      plugins:{
+        legend:{ position:'bottom', labels:{ color:cc.text, padding:12, font:{size:11,weight:'600'}, boxWidth:10, boxHeight:10 } }
+      }
+    }
+  });
+}
+
+
+// ── Filter + sort ──
+function onFilter() {
+  page = 1;
+  const q     = document.getElementById('search').value.toLowerCase();
+  const fApp  = document.getElementById('f-app').value;
+  const fSev  = document.getElementById('f-sev').value;
+  const fTool = document.getElementById('f-tool').value;
+  filtered = allData.filter(v=>{
+    if(fApp  && v.app      !==fApp)  return false;
+    if(fSev  && v.severity !==fSev)  return false;
+    if(fTool && v.tool     !==fTool) return false;
+    if(q && !((v.title||'').toLowerCase().includes(q) ||
+              (v.description||'').toLowerCase().includes(q) ||
+              (v.file_path||'').toLowerCase().includes(q))) return false;
+    return true;
+  });
+  renderTable();
+}
+
+function sortBy(col) {
+  if(sortCol===col) sortDir = sortDir==='asc'?'desc':'asc';
+  else { sortCol=col; sortDir=col==='severity'?'asc':'desc'; }
+  document.querySelectorAll('thead th').forEach(th=>{
+    th.classList.remove('sort-asc','sort-desc');
+    if(th.id==='th-'+col) th.classList.add(sortDir==='asc'?'sort-asc':'sort-desc');
+  });
+  renderTable();
+}
+
+// ── Table render ──
+function renderTable() {
+  const sorted = [...filtered].sort((a,b)=>{
+    let av=a[sortCol], bv=b[sortCol];
+    if(sortCol==='severity'){av=sevOrder(av);bv=sevOrder(bv);}
+    if(av<bv) return sortDir==='asc'?-1:1;
+    if(av>bv) return sortDir==='asc'?1:-1;
+    return 0;
+  });
+  document.getElementById('count-pill').textContent = filtered.length;
+  const total = sorted.length;
+  const pages = Math.max(1,Math.ceil(total/PAGE_SIZE));
+  if(page>pages) page=pages;
+  const slice = sorted.slice((page-1)*PAGE_SIZE, page*PAGE_SIZE);
+
+  if(total===0){
+    document.getElementById('tbody').innerHTML=`<tr><td class="state-td" colspan="6">
+      <div class="state-icon">✓</div>
+      <div class="state-msg">No findings match your filters</div>
+    </td></tr>`;
+    document.getElementById('pagination').style.display='none';
+    return;
+  }
+
+  let html='';
+  slice.forEach(v=>{
+    const isExp = expanded.has(v.id);
+    html+=`<tr onclick="toggleRow(${v.id})" class="${isExp?'expanded':''}">
+      <td><span class="app-chip">${esc(v.app)}</span></td>
+      <td><span class="sev sev-${esc(v.severity)}"><span class="sev-dot"></span>${esc(v.severity)}</span></td>
+      <td><span class="tool-chip">${esc(v.tool)}</span></td>
+      <td class="cell-title"><span class="expand-icon">▶</span>${esc(v.title||'(no title)')}</td>
+      <td class="cell-path" title="${esc(v.file_path)}">${esc(v.file_path)||'—'}</td>
+      <td class="cell-time">${reltime(v.created_at)}</td>
+    </tr>`;
+    if(isExp) html+=`<tr class="detail-row">
+      <td class="detail-cell" colspan="6">${buildAdvisory(v)}</td>
+    </tr>`;
+  });
+  document.getElementById('tbody').innerHTML=html;
+
+  // Pagination
+  const pag = document.getElementById('pagination');
+  pag.style.display='flex';
+  const start=(page-1)*PAGE_SIZE+1, end=Math.min(page*PAGE_SIZE,total);
+  let btns=`<span class="page-info">Showing ${start}–${end} of ${total}</span><div class="page-btns">`;
+  btns+=`<button class="pg-btn" onclick="goPage(${page-1})" ${page===1?'disabled':''}>‹</button>`;
+  const range=pageRange(page,pages);
+  range.forEach(p=>{
+    if(p==='…') btns+=`<span class="pg-sep">…</span>`;
+    else btns+=`<button class="pg-btn ${p===page?'active':''}" onclick="goPage(${p})">${p}</button>`;
+  });
+  btns+=`<button class="pg-btn" onclick="goPage(${page+1})" ${page===pages?'disabled':''}>›</button>`;
+  btns+='</div>';
+  pag.innerHTML=btns;
+}
+
+function pageRange(cur,total){
+  if(total<=7) return Array.from({length:total},(_,i)=>i+1);
+  if(cur<=4)   return [1,2,3,4,5,'…',total];
+  if(cur>=total-3) return [1,'…',total-4,total-3,total-2,total-1,total];
+  return [1,'…',cur-1,cur,cur+1,'…',total];
+}
+
+function goPage(p){
+  page=p;
+  renderTable();
+  window.scrollTo({top:document.querySelector('.panel').offsetTop-80,behavior:'smooth'});
+}
+
+function toggleRow(id){
+  if(expanded.has(id)) expanded.delete(id);
+  else expanded.add(id);
+  renderTable();
+}
+
+// ── Export CSV ──
+function exportCSV(){
+  const rows=[['App','Severity','Tool','Title','Description','File','Detected']];
+  filtered.forEach(v=>rows.push([v.app,v.severity,v.tool,v.title,v.description,v.file_path,v.created_at].map(c=>`"${String(c??'').replace(/"/g,'""')}"`)));
+  const blob=new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`vulnerabilities-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+// ── Advisory panel builder ──
+function buildAdvisory(v) {
+  const title = v.title || '';
+  const desc  = v.description || 'No description available.';
+
+  // Extract CVE IDs from title and description
+  const cvePattern = /CVE-\d{4}-\d{4,}/g;
+  const cves = [...new Set([...title.matchAll(cvePattern), ...desc.matchAll(cvePattern)].map(m=>m[0]))];
+
+  // External links
+  const links = [];
+  cves.forEach(cve => {
+    links.push(`<a class="adv-link" href="https://nvd.nist.gov/vuln/detail/${cve}" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      NVD — ${cve}</a>`);
+  });
+  if (v.tool === 'OWASP-ZAP') {
+    links.push(`<a class="adv-link" href="https://www.zaproxy.org/docs/alerts/" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      OWASP ZAP Alerts</a>`);
+  }
+  if (v.tool === 'Semgrep') {
+    links.push(`<a class="adv-link" href="https://semgrep.dev/r" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      Semgrep Rules</a>`);
+  }
+  if (v.tool === 'Gitleaks') {
+    links.push(`<a class="adv-link" href="https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      Gitleaks Rules</a>`);
+  }
+  if (v.tool === 'OWASP-DepCheck') {
+    links.push(`<a class="adv-link" href="https://owasp.org/www-project-dependency-check/" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      OWASP DepCheck</a>`);
+  }
+
+  // Parse description sections (### heading → section)
+  function parseSections(text) {
+    const sections = [];
+    const parts = text.split(/(?=###\s)/);
+    parts.forEach(part => {
+      const headMatch = part.match(/^###\s+(.+?)\n([\s\S]*)/);
+      if (headMatch) {
+        sections.push({ title: headMatch[1].trim(), body: headMatch[2].trim() });
+      } else if (part.trim()) {
+        sections.push({ title: null, body: part.trim() });
+      }
+    });
+    return sections.length ? sections : [{ title: null, body: text.trim() }];
+  }
+
+  function renderBody(text) {
+    // Wrap code blocks
+    text = text.replace(/```[\s\S]*?```/g, m => `<pre>${esc(m.replace(/```\w*\n?/g,'').trim())}</pre>`);
+    // Inline code
+    text = text.replace(/`([^`]+)`/g, (_,c) => `<code>${esc(c)}</code>`);
+    // CVE links inline
+    text = text.replace(/CVE-\d{4}-\d{4,}/g, cve =>
+      `<a href="https://nvd.nist.gov/vuln/detail/${cve}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;font-weight:600;">${cve}</a>`);
+    // Paragraphs
+    text = text.replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>');
+    return `<p>${text}</p>`;
+  }
+
+  const sections = parseSections(desc);
+  const sectionsHtml = sections.map(s => `
+    <div class="adv-section">
+      ${s.title ? `<div class="adv-section-title">${esc(s.title)}</div>` : ''}
+      <div class="adv-section-body">${renderBody(s.body)}</div>
+    </div>`).join('');
+
+  const idLabel = cves.length ? cves[0] : (title.length > 60 ? title.slice(0,60)+'…' : title);
+
+  return `<div class="advisory">
+    <div class="advisory-head">
+      <div class="advisory-meta">
+        <span class="advisory-id">${esc(idLabel)}</span>
+        <span class="sev sev-${esc(v.severity)}"><span class="sev-dot"></span>${esc(v.severity)}</span>
+        <span class="tool-chip">${esc(v.tool)}</span>
+        <span class="app-chip">${esc(v.app)}</span>
+      </div>
+      ${links.length ? `<div class="advisory-links">${links.join('')}</div>` : ''}
+    </div>
+    <div class="advisory-body">
+      <div class="advisory-desc">${sectionsHtml}</div>
+      <div class="advisory-sidebar">
+        <div class="sidebar-item">
+          <span class="sidebar-lbl">File / Target</span>
+          <span class="sidebar-val mono">${esc(v.file_path || '—')}</span>
+        </div>
+        <div class="sidebar-item">
+          <span class="sidebar-lbl">Tool</span>
+          <span class="sidebar-val">${esc(v.tool)}</span>
+        </div>
+        <div class="sidebar-item">
+          <span class="sidebar-lbl">Application</span>
+          <span class="sidebar-val">${esc(v.app)}</span>
+        </div>
+        <div class="sidebar-item">
+          <span class="sidebar-lbl">Detected</span>
+          <span class="sidebar-val">${reltime(v.created_at)}</span>
+        </div>
+        ${cves.map(cve=>`<div class="sidebar-item">
+          <span class="sidebar-lbl">CVE ID</span>
+          <a href="https://nvd.nist.gov/vuln/detail/${cve}" target="_blank" rel="noopener" style="color:var(--accent);font-size:12px;font-weight:600;font-family:'SF Mono','Fira Code',monospace;text-decoration:none;">${cve} ↗</a>
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+// init sort header
+document.getElementById('th-severity').classList.add('sort-asc');
+window.onload=load;
+</script>
+</body>
+</html>

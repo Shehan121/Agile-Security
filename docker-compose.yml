@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: vuln-backend
+    ports:
+      - "3001:3001"
+    volumes:
+      - vuln-data:/data
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: vuln-frontend
+    ports:
+      - "3002:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  vuln-data:
