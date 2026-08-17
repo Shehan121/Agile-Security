@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Local database (the real one lives in the vuln-data Docker volume)
+*.db
+*.db-wal
+*.db-shm
+
+# IDE
+.idea/
+*.iml
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
