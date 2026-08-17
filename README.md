@@ -162,12 +162,13 @@ conflict so a re-run updates its own snapshot instead of adding another.
 ### Locally
 
 ```bash
+cd backend
 npm ci
 DB_PATH=./vulns.db node server.js       # backend on :3001
 ```
 
-Then serve `index.html` with any static server, or open it directly. Note the
-API base URL is currently hardcoded — see *Known issues* below.
+Then serve `frontend/index.html` with any static server, or open it directly.
+Note the API base URL is currently hardcoded — see *Known issues* below.
 
 Seed it with a finding to check the round trip:
 
@@ -186,8 +187,8 @@ curl http://localhost:3001/vulnerabilities/stats
 docker compose up --build     # backend :3001, frontend :3002
 ```
 
-`docker-compose.yml` expects `./backend` and `./frontend` directories — see
-*Known issues*.
+Builds `backend/` as a Node image and `frontend/` as nginx, with findings
+persisted in the named volume `vuln-data`.
 
 ### CI/CD
 
@@ -207,30 +208,32 @@ variables are provided by GitLab.
 
 Documented rather than hidden — these are real and worth fixing:
 
-1. **`docker-compose.yml` does not work against this repository layout.** It
-   builds from `./backend` and `./frontend`, but the source files sit flattened
-   at the repository root. The correct two-directory layout exists only inside
-   the committed `.zip`. Fixing this means moving `server.js`, `package*.json`
-   and the `Dockerfile` into `backend/`, and `index.html` plus a three-line
-   nginx `Dockerfile` into `frontend/`.
+1. **The frontend API URL is hardcoded to a private address** —
+   `const API = 'http://10.97.13.101:3001'` in `frontend/index.html:334`. The
+   dashboard therefore only works on the network where that host exists. It
+   should come from a build-time or runtime configuration value. Reverse-proxying
+   `/api` through nginx would remove both this and the need for CORS.
 
-2. **The frontend API URL is hardcoded to a private address** —
-   `const API = 'http://10.97.13.101:3001'` in `index.html:334`. The dashboard
-   therefore only works on the network where that host exists. It should come
-   from a build-time or runtime configuration value.
-
-3. **A build artifact is committed.** `vulnerabilitydashboard-shehan (3).zip`
-   duplicates the whole project. It is retained for now only because it is the
-   sole copy of the intended `backend/` + `frontend/` structure; it should go
-   once issue 1 is fixed.
-
-4. **No automated tests.** For a project whose subject is software quality,
+2. **No automated tests.** For a project whose subject is software quality,
    this is the most conspicuous gap. The ingest endpoint's deduplication logic
    is the obvious place to start.
 
-5. **The ingest endpoint is unauthenticated.** Acceptable inside a private
+3. **The ingest endpoint is unauthenticated.** Acceptable inside a private
    network for a coursework deployment; it would need a token before being
    exposed anywhere real.
+
+4. **Chart.js is loaded from a CDN**, so the dashboard degrades without internet
+   access — a real consideration for the on-premise deployment this project
+   targets.
+
+### Previously fixed
+
+- ~~`docker-compose.yml` built from `./backend` and `./frontend`, which did not
+  exist — the source sat flattened at the repository root, so compose could not
+  work from a clean clone.~~ The two-directory layout has been restored.
+- ~~`.gitlab-ci.yml` existed only inside a committed zip archive, so GitLab never
+  saw the pipeline.~~ Recovered to the repository root.
+- ~~A 93 KB zip duplicating the entire project was committed.~~ Unpacked and removed.
 
 ## Tech stack
 
@@ -248,11 +251,14 @@ Documented rather than hidden — these are real and worth fixing:
 
 ```
 .
-├── server.js              Express API — ingest, query, stats, trend
-├── index.html             the entire dashboard UI (single file)
-├── package.json           express, cors, better-sqlite3
-├── Dockerfile             backend image (node:20-alpine)
-├── docker-compose.yml     backend + frontend + named volume
+├── backend/
+│   ├── server.js          Express API — ingest, query, stats, trend
+│   ├── package.json       express, cors, better-sqlite3
+│   └── Dockerfile         node:20-alpine
+├── frontend/
+│   ├── index.html         the entire dashboard UI (single file)
+│   └── Dockerfile         nginx:alpine, copies index.html
+├── docker-compose.yml     backend :3001 + frontend :3002 + named volume
 ├── .gitlab-ci.yml         publish and deploy pipeline
 ├── ARCHITECTURE.md        design decisions and reasoning
 └── README.md

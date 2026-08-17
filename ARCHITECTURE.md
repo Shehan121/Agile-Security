@@ -181,14 +181,12 @@ pinned `known_hosts` entry would be the correct fix.
 
 In priority order:
 
-1. **Restore the `backend/` + `frontend/` layout** so `docker-compose.yml`
-   actually works from a clone (see README *Known issues*).
-2. **Reverse-proxy the API** to kill the hardcoded IP and the CORS dependency.
-3. **Tests for the ingest endpoint** — the three deduplication layers are the
+1. **Reverse-proxy the API** to kill the hardcoded IP and the CORS dependency.
+2. **Tests for the ingest endpoint** — the three deduplication layers are the
    highest-risk logic and are currently unverified.
-4. **Authenticate `POST /vulnerabilities`** with a shared token from a CI
+3. **Authenticate `POST /vulnerabilities`** with a shared token from a CI
    variable.
-5. **Vendor Chart.js** so the dashboard works fully offline.
-6. **Keep per-finding history** with a `first_seen` / `last_seen` model instead
+4. **Vendor Chart.js** so the dashboard works fully offline.
+5. **Keep per-finding history** with a `first_seen` / `last_seen` model instead
    of delete-and-replace, which would allow "how long has this been open?"
    — the question the current schema cannot answer.
