@@ -227,6 +227,31 @@ and the dashboard on `:3001` (API) and `:3002` (UI).
 
 `CI_REGISTRY*`, `CI_JOB_TOKEN` and `CI_API_V4_URL` are provided by GitLab.
 
+### GitHub Actions
+
+`.github/workflows/security-pipeline.yml` runs the same pipeline on GitHub. It
+has the same jobs in the same order, and the same report step
+(`.github/scripts/report-to-dashboard.sh`). It differs from GitLab in a few places:
+
+- Images are pushed to `ghcr.io/<owner>/<repo>/…` and the todolist jar to
+  GitHub Packages, both using the built-in `GITHUB_TOKEN`.
+- ZAP scans each app in a container started inside its own job, so DAST
+  works on GitHub-hosted runners.
+- Deploy and report jobs run only when the `SSH_IP` repository variable is set.
+  Because the VM is on the university network, they need a self-hosted runner
+  that can reach it, set by its label in `DEPLOY_RUNNER`.
+
+| Setting | Kind | Purpose |
+|---|---|---|
+| `NVD_API_KEY` | secret | OWASP Dependency Check |
+| `SSH_PRIVATE_KEY` | secret | Deployment VM |
+| `SSH_IP`, `SSH_USER` | variable | Deployment VM. Unset means deploy and report are skipped |
+| `DEPLOY_RUNNER` | variable | Runner label for deploy and report jobs (default `ubuntu-latest`) |
+| `DASHBOARD_URL` | variable | Defaults to `http://$SSH_IP:3001` |
+
+Every scanner report is also kept as a workflow artifact, so the findings stay
+downloadable even when no dashboard is reachable.
+
 ---
 
 ## Known issues
@@ -290,6 +315,7 @@ Documented rather than hidden — these are real and worth fixing:
 │   └── report-to-dashboard.gitlab-ci.yml reports → POST /vulnerabilities
 ├── docker-compose.yml     backend :3001 + frontend :3002 + named volume
 ├── .gitlab-ci.yml         stage order + includes
+├── .github/workflows/     the same pipeline for GitHub Actions
 ├── ARCHITECTURE.md        design decisions and reasoning
 └── README.md
 ```

@@ -1,0 +1,475 @@
+# GitHub Actions port of the GitLab pipeline (.gitlab-ci.yml and the files it
+# includes). Same apps, same tools, same order per app:
+#
+#   build → test → sast → package → sca-package → sca-container → publish → deploy → dast → report
+#
+# Differences from GitLab:
+# - Images go to ghcr.io and the todolist jar to GitHub Packages, using GITHUB_TOKEN.
+# - ZAP scans each app in a container started inside its own job, so DAST runs
+#   on GitHub-hosted runners without the deployment VM.
+# - Deploy and report jobs run only when the SSH_IP repository variable is set.
+#   The VM is on the university network, so they need a runner that can reach it:
+#   set DEPLOY_RUNNER to that self-hosted runner's label.
+#
+# Repository variables (Settings → Secrets and variables → Actions → Variables):
+#   SSH_IP, SSH_USER, DEPLOY_RUNNER (default ubuntu-latest), DASHBOARD_URL (default http://$SSH_IP:3001)
+# Repository secrets:
+#   SSH_PRIVATE_KEY, NVD_API_KEY
+
+name: Security pipeline
+
+# Every push, like GitLab. Not pull_request: publish and deploy need write access.
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  ZAP_IMAGE: ghcr.io/zaproxy/zaproxy:stable
+  TRIVY_IMAGE: aquasec/trivy:latest
+  SEMGREP_IMAGE: semgrep/semgrep:latest
+  GITLEAKS_IMAGE: zricethezav/gitleaks:latest
+
+jobs:
+
+  # ════════════════════════════ ToDo List ════════════════════════════
+
+  todolist-build:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: todolist } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17', cache: maven, cache-dependency-path: todolist/pom.xml }
+      - run: mvn -B clean compile
+
+  todolist-unit-test:
+    needs: todolist-build
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: todolist } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17', cache: maven, cache-dependency-path: todolist/pom.xml }
+      - run: mvn -B test -Dtest='*UnitTests' -Dsurefire.failIfNoSpecifiedTests=false
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: todolist-unit-test, path: todolist/target/surefire-reports/ }
+
+  todolist-integration-test:
+    needs: todolist-build
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: todolist } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17', cache: maven, cache-dependency-path: todolist/pom.xml }
+      - run: mvn -B test -Dtest='*IntegrationTests' -Dsurefire.failIfNoSpecifiedTests=false
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: todolist-integration-test, path: todolist/target/surefire-reports/ }
+
+  todolist-semgrep:
+    needs: [todolist-unit-test, todolist-integration-test]
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - run: mkdir -p reports && chmod 777 reports
+      - run: |
+          docker run --rm -v "$PWD:/src" -w /src/todolist $SEMGREP_IMAGE \
+            semgrep scan --config=auto --gitlab-sast --output=/src/reports/gl-sast-report.json . || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: todolist-semgrep, path: reports/gl-sast-report.json }
+
+  todolist-gitleaks:
+    needs: [todolist-unit-test, todolist-integration-test]
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - run: mkdir -p reports && chmod 777 reports
+      - run: |
+          docker run --rm -v "$PWD:/repo" -w /repo/todolist \
+            -e GIT_CONFIG_COUNT=1 -e GIT_CONFIG_KEY_0=safe.directory -e GIT_CONFIG_VALUE_0='*' \
+            $GITLEAKS_IMAGE detect --source . -r /repo/reports/gitleaks-report.json -f json || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: todolist-gitleaks, path: reports/gitleaks-report.json }
+
+  todolist-package:
+    needs: [todolist-semgrep, todolist-gitleaks]
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: todolist } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17', cache: maven, cache-dependency-path: todolist/pom.xml }
+      - run: mvn -B clean package -DskipTests
+      - run: ls -lah target/
+      - uses: actions/upload-artifact@v4
+        with: { name: todolist-jar, path: todolist/target/*.jar }
+
+  todolist-dependency-check:
+    needs: todolist-package
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    defaults: { run: { working-directory: todolist } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17', cache: maven, cache-dependency-path: todolist/pom.xml }
+      - uses: actions/cache@v4
+        with:
+          path: todolist/.dependency-check
+          key: dependency-check-${{ github.run_id }}
+          restore-keys: dependency-check-
+      - run: |
+          mvn -B org.owasp:dependency-check-maven:check \
+            -DfailBuildOnCVSS=11 \
+            -Dformats=HTML,JSON \
+            -DnvdApiKey=${{ secrets.NVD_API_KEY }} \
+            -DdataDirectory=.dependency-check
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: todolist-dependency-check
+          path: |
+            todolist/target/dependency-check-report.json
+            todolist/target/dependency-check-report.html
+
+  todolist-trivy:
+    needs: todolist-dependency-check
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - run: mkdir -p reports && chmod 777 reports
+      - run: |
+          docker run --rm -v "$PWD:/src" -w /src $TRIVY_IMAGE fs --format json -o reports/trivy-report.json todolist
+          docker run --rm -v "$PWD:/src" -w /src $TRIVY_IMAGE fs todolist > reports/trivy-report.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: todolist-trivy, path: reports/ }
+
+  todolist-publish-package:
+    needs: todolist-trivy
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: todolist } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17', cache: maven, cache-dependency-path: todolist/pom.xml, server-id: github }
+      - run: mvn -B deploy -DskipTests -DaltDeploymentRepository=github::https://maven.pkg.github.com/${{ github.repository }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  todolist-publish-container:
+    needs: todolist-trivy
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: todolist-jar, path: todolist/target }
+      - uses: docker/login-action@v3
+        with: { registry: ghcr.io, username: '${{ github.actor }}', password: '${{ secrets.GITHUB_TOKEN }}' }
+      - run: |
+          IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}/todolist
+          docker build -t $IMAGE:${GITHUB_SHA::8} -t $IMAGE:latest ./todolist
+          docker push $IMAGE:${GITHUB_SHA::8}
+          docker push $IMAGE:latest
+
+  todolist-deploy:
+    needs: todolist-publish-container
+    if: vars.SSH_IP != ''
+    runs-on: ${{ vars.DEPLOY_RUNNER || 'ubuntu-latest' }}
+    continue-on-error: true
+    steps:
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ vars.SSH_IP }} >> ~/.ssh/known_hosts
+      - run: |
+          IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}/todolist:${GITHUB_SHA::8}
+          ssh ${{ vars.SSH_USER }}@${{ vars.SSH_IP }} << EOF | tee deploy.log
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker pull $IMAGE
+
+          docker stop todolist || true
+          docker rm todolist || true
+
+          docker run -d \
+            --name todolist \
+            -p 8080:8080 \
+            --restart unless-stopped \
+            $IMAGE
+
+          docker ps
+          EOF
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: todolist-deploy-log, path: deploy.log }
+
+  todolist-zap:
+    needs: todolist-publish-container
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: docker/login-action@v3
+        with: { registry: ghcr.io, username: '${{ github.actor }}', password: '${{ secrets.GITHUB_TOKEN }}' }
+      - name: Start ToDo List
+        run: |
+          docker run -d --name todolist -p 8080:8080 ghcr.io/${GITHUB_REPOSITORY,,}/todolist:${GITHUB_SHA::8}
+          for i in $(seq 1 30); do curl -fs -o /dev/null http://localhost:8080 && exit 0; sleep 3; done
+          docker logs todolist; exit 1
+      - run: |
+          mkdir -p reports && chmod 777 reports
+          docker run --rm --network host -v "$PWD/reports:/zap/wrk:rw" $ZAP_IMAGE \
+            zap-baseline.py -t http://localhost:8080 -J zap-report.json -r zap-report.html -l WARN || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: todolist-zap, path: reports/ }
+
+  # ════════════════════════════ OWASP Juice Shop ════════════════════════════
+
+  juiceshop-package:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: OWASP_JuiceShop } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('OWASP_JuiceShop/package.json', 'OWASP_JuiceShop/frontend/package.json') }}
+          restore-keys: npm-
+      - run: npm install --prefer-offline
+      - run: npm run build:frontend
+      - run: npm run build:server
+      - run: npm run package
+      - uses: actions/upload-artifact@v4
+        with: { name: juiceshop-dist, path: OWASP_JuiceShop/dist/ }
+
+  juiceshop-semgrep:
+    needs: juiceshop-package
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - run: mkdir -p reports && chmod 777 reports
+      - run: |
+          docker run --rm -v "$PWD:/src" -w /src/OWASP_JuiceShop $SEMGREP_IMAGE \
+            semgrep scan --config=auto --gitlab-sast --output /src/reports/gl-sast-report.json . || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: juiceshop-semgrep, path: reports/gl-sast-report.json }
+
+  juiceshop-gitleaks:
+    needs: juiceshop-package
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - run: mkdir -p reports && chmod 777 reports
+      - run: |
+          docker run --rm -v "$PWD:/repo" -w /repo/OWASP_JuiceShop \
+            -e GIT_CONFIG_COUNT=1 -e GIT_CONFIG_KEY_0=safe.directory -e GIT_CONFIG_VALUE_0='*' \
+            $GITLEAKS_IMAGE detect --source . -r /repo/reports/gitleaks-report.json -f json || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: juiceshop-gitleaks, path: reports/gitleaks-report.json }
+
+  juiceshop-npm-audit:
+    needs: [juiceshop-semgrep, juiceshop-gitleaks]
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: OWASP_JuiceShop } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('OWASP_JuiceShop/package.json', 'OWASP_JuiceShop/frontend/package.json') }}
+          restore-keys: npm-
+      - run: npm install --prefer-offline
+      - run: npm run sbom
+      - run: |
+          npm audit --json > audit-report.json || true
+          npm audit > audit-report.txt || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: juiceshop-npm-audit
+          path: |
+            OWASP_JuiceShop/bom.json
+            OWASP_JuiceShop/audit-report.json
+            OWASP_JuiceShop/audit-report.txt
+
+  juiceshop-trivy:
+    needs: juiceshop-npm-audit
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - run: mkdir -p reports && chmod 777 reports
+      - run: |
+          docker run --rm -v "$PWD:/src" -w /src $TRIVY_IMAGE fs --format json -o reports/trivy-report.json OWASP_JuiceShop
+          docker run --rm -v "$PWD:/src" -w /src $TRIVY_IMAGE fs OWASP_JuiceShop > reports/trivy-report.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: juiceshop-trivy, path: reports/ }
+
+  juiceshop-publish-container:
+    needs: juiceshop-trivy
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with: { registry: ghcr.io, username: '${{ github.actor }}', password: '${{ secrets.GITHUB_TOKEN }}' }
+      - run: |
+          IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}/juiceshop
+          docker build \
+            --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+            --build-arg VCS_REF=${GITHUB_SHA::8} \
+            -t $IMAGE:${GITHUB_SHA::8} \
+            -t $IMAGE:latest \
+            ./OWASP_JuiceShop
+          docker push $IMAGE:${GITHUB_SHA::8}
+          docker push $IMAGE:latest
+
+  juiceshop-deploy:
+    needs: juiceshop-publish-container
+    if: vars.SSH_IP != ''
+    runs-on: ${{ vars.DEPLOY_RUNNER || 'ubuntu-latest' }}
+    steps:
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ vars.SSH_IP }} >> ~/.ssh/known_hosts
+      - run: |
+          IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}/juiceshop:latest
+          ssh ${{ vars.SSH_USER }}@${{ vars.SSH_IP }} << EOF | tee deploy.log
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker pull $IMAGE
+
+          docker stop juiceshop || true
+          docker rm juiceshop || true
+
+          docker run -d \
+            --name juiceshop \
+            -p 3000:3000 \
+            --restart unless-stopped \
+            $IMAGE
+
+          docker ps
+          EOF
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: juiceshop-deploy-log, path: deploy.log }
+
+  juiceshop-zap:
+    needs: juiceshop-publish-container
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 120
+    steps:
+      - uses: docker/login-action@v3
+        with: { registry: ghcr.io, username: '${{ github.actor }}', password: '${{ secrets.GITHUB_TOKEN }}' }
+      - name: Start Juice Shop
+        run: |
+          docker run -d --name juiceshop -p 3000:3000 ghcr.io/${GITHUB_REPOSITORY,,}/juiceshop:${GITHUB_SHA::8}
+          for i in $(seq 1 40); do curl -fs -o /dev/null http://localhost:3000 && exit 0; sleep 3; done
+          docker logs juiceshop; exit 1
+      - run: |
+          mkdir -p reports && chmod 777 reports
+          docker run --rm --network host -v "$PWD/reports:/zap/wrk:rw" $ZAP_IMAGE \
+            zap-full-scan.py -t http://localhost:3000 -J zap-report.json -r zap-report.html -l WARN || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: juiceshop-zap, path: reports/ }
+
+  # ════════════════════════════ Vulnerability Dashboard ════════════════════════════
+
+  dashboard-publish:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        component: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with: { registry: ghcr.io, username: '${{ github.actor }}', password: '${{ secrets.GITHUB_TOKEN }}' }
+      - run: |
+          IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}/${{ matrix.component }}:latest
+          docker build -t $IMAGE ./${{ matrix.component }}
+          docker push $IMAGE
+
+  dashboard-deploy:
+    needs: dashboard-publish
+    if: vars.SSH_IP != ''
+    runs-on: ${{ vars.DEPLOY_RUNNER || 'ubuntu-latest' }}
+    steps:
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo -e "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > ~/.ssh/config
+      - run: |
+          PREFIX=ghcr.io/${GITHUB_REPOSITORY,,}
+          ssh ${{ vars.SSH_USER }}@${{ vars.SSH_IP }} << EOF
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+            docker pull $PREFIX/backend:latest
+            docker pull $PREFIX/frontend:latest
+            docker stop vuln-backend  || true
+            docker stop vuln-frontend || true
+            docker rm   vuln-backend  || true
+            docker rm   vuln-frontend || true
+            docker network create vuln-network || true
+            docker run -d --name vuln-backend  --network vuln-network -p 3001:3001 -v vuln-data:/data --restart unless-stopped $PREFIX/backend:latest
+            docker run -d --name vuln-frontend --network vuln-network -p 3002:80   --restart unless-stopped $PREFIX/frontend:latest
+            docker ps
+          EOF
+
+  # ════════════════════════════ Report ════════════════════════════
+
+  report-to-dashboard:
+    needs:
+      - todolist-semgrep
+      - todolist-gitleaks
+      - todolist-dependency-check
+      - todolist-trivy
+      - todolist-zap
+      - juiceshop-semgrep
+      - juiceshop-gitleaks
+      - juiceshop-npm-audit
+      - juiceshop-trivy
+      - juiceshop-zap
+      - dashboard-deploy
+    if: always() && (vars.SSH_IP != '' || vars.DASHBOARD_URL != '')
+    runs-on: ${{ vars.DEPLOY_RUNNER || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: reports
+          pattern: '{todolist,juiceshop}-{semgrep,gitleaks,dependency-check,npm-audit,trivy,zap}'
+      - run: command -v jq >/dev/null || sudo apt-get install -y jq
+      - run: sh .github/scripts/report-to-dashboard.sh
+        env:
+          DASHBOARD_URL: ${{ vars.DASHBOARD_URL || format('http://{0}:3001', vars.SSH_IP) }}
+          REPORTS_DIR: reports
+          RUN_ID: pipeline-${{ github.run_id }}
