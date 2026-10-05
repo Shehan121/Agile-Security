@@ -202,9 +202,6 @@ persisted in the named volume `vuln-data`.
 Required CI variables: `SSH_PRIVATE_KEY`, `SSH_USER`, `SSH_IP`. `CI_REGISTRY*`
 variables are provided by GitLab.
 
-The security pipelines that feed the dashboard, for the ToDo List and OWASP
-Juice Shop, are in [`pipelines/`](pipelines/README.md).
-
 ---
 
 ## Known issues
@@ -262,7 +259,6 @@ Documented rather than hidden — these are real and worth fixing:
 │   ├── index.html         the entire dashboard UI (single file)
 │   └── Dockerfile         nginx:alpine, copies index.html
 ├── docker-compose.yml     backend :3001 + frontend :3002 + named volume
-├── pipelines/             security pipelines for ToDo List and Juice Shop
 ├── .gitlab-ci.yml         publish and deploy pipeline
 ├── ARCHITECTURE.md        design decisions and reasoning
 └── README.md
