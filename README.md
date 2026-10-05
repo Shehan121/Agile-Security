@@ -7,6 +7,12 @@ pipeline duplicates everything it already found. This service takes the raw
 output of several scanners across multiple applications, deduplicates it,
 stores it, and renders one prioritised view of where the real risk is.
 
+The repository holds the whole setup in one place: two applications under test
+(a Spring Boot **ToDo List** and **OWASP Juice Shop**), the security pipelines
+that scan them, and the dashboard that shows what those pipelines find. Pushing
+to GitLab runs everything: both apps are built, scanned and deployed, and the
+findings appear in the dashboard.
+
 Built as part of *Groupe Trois, Sprint 1*. The project brief, tool research and
 sprint documentation live in a companion repository:
 **[ITSecurtiy](https://github.com/Shehan121/ITSecurtiy)**.
@@ -192,15 +198,34 @@ persisted in the named volume `vuln-data`.
 
 ### CI/CD
 
-`.gitlab-ci.yml` defines two stages:
+The root `.gitlab-ci.yml` sets the stage order and includes four pipeline files:
 
-1. **publish** — build and push `backend:latest` and `frontend:latest` to the
-   GitLab container registry (Docker-in-Docker)
-2. **deploy** — SSH to the target host, pull both images, recreate the
-   containers on a shared `vuln-network`
+| File | Jobs |
+|---|---|
+| `todolist/.gitlab-ci.yml` | build, unit + integration tests, Semgrep, Gitleaks, package, OWASP Dependency Check, Trivy, publish (Maven package + container), deploy, ZAP baseline scan |
+| `OWASP_JuiceShop/.gitlab-ci.yml` | package, Semgrep, Gitleaks, npm audit + SBOM, Trivy, publish container, deploy, ZAP full scan |
+| `ci/dashboard.gitlab-ci.yml` | build and push the dashboard's `backend` and `frontend` images, then deploy them over SSH |
+| `ci/report-to-dashboard.gitlab-ci.yml` | convert every scanner report to the ingest format and `POST` it to the dashboard |
 
-Required CI variables: `SSH_PRIVATE_KEY`, `SSH_USER`, `SSH_IP`. `CI_REGISTRY*`
-variables are provided by GitLab.
+```
+build → test → sast → package → sca-package → sca-container → publish → deploy → dast → report
+```
+
+The scanners don't fail the pipeline on findings. They save reports as job
+artifacts. `report_to_dashboard` runs last and always runs, even when an
+earlier job fails. It posts each report under app `Todolist` or `JuiceShop` with
+the tool names the dashboard's filters use. A missing report is skipped, so
+that tool keeps its previous results.
+
+All three services run on one VM: ToDo List on `:8080`, Juice Shop on `:3000`,
+and the dashboard on `:3001` (API) and `:3002` (UI).
+
+| CI variable | Purpose |
+|---|---|
+| `SSH_PRIVATE_KEY`, `SSH_USER`, `SSH_IP` | Deployment VM. `SSH_IP` is also the ZAP target and dashboard host |
+| `NVD_API_KEY` | OWASP Dependency Check's NVD download. Without it, NVD rate limits cause 503 failures |
+
+`CI_REGISTRY*`, `CI_JOB_TOKEN` and `CI_API_V4_URL` are provided by GitLab.
 
 ---
 
@@ -258,8 +283,13 @@ Documented rather than hidden — these are real and worth fixing:
 ├── frontend/
 │   ├── index.html         the entire dashboard UI (single file)
 │   └── Dockerfile         nginx:alpine, copies index.html
+├── todolist/              Spring Boot ToDo List + its security pipeline
+├── OWASP_JuiceShop/       OWASP Juice Shop 19.2.1 + its security pipeline
+├── ci/
+│   ├── dashboard.gitlab-ci.yml           dashboard publish and deploy
+│   └── report-to-dashboard.gitlab-ci.yml reports → POST /vulnerabilities
 ├── docker-compose.yml     backend :3001 + frontend :3002 + named volume
-├── .gitlab-ci.yml         publish and deploy pipeline
+├── .gitlab-ci.yml         stage order + includes
 ├── ARCHITECTURE.md        design decisions and reasoning
 └── README.md
 ```

@@ -1,0 +1,1741 @@
+{
+    "$schema": "https://gitlab.com/gitlab-org/security-products/security-report-schemas/-/blob/master/dist/sast-report-format.json",
+    "version": "15.0.4",
+    "scan": {
+        "start_time": "2026-05-15T11:16:46",
+        "end_time": "2026-05-15T11:16:46",
+        "analyzer": {
+            "id": "semgrep",
+            "name": "Semgrep",
+            "url": "https://semgrep.dev",
+            "version": "1.162.0",
+            "vendor": {
+                "name": "Semgrep"
+            }
+        },
+        "scanner": {
+            "id": "semgrep",
+            "name": "Semgrep",
+            "url": "https://semgrep.dev",
+            "version": "1.162.0",
+            "vendor": {
+                "name": "Semgrep"
+            }
+        },
+        "version": "1.162.0",
+        "status": "success",
+        "type": "sast"
+    },
+    "vulnerabilities": [
+        {
+            "category": "sast",
+            "id": "1128838d-694e-0813-9e93-79ef134a2659",
+            "cve": ".github/workflows/update-challenges-ebook.yml:fdf09b1a8881fe89a6066a341f8f9e993d80642da6ee2d48f41779261661372a:yaml.github-actions.security.run-shell-injection.run-shell-injection",
+            "message": "Using variable interpolation `${{...}}` with `github` context data in a `run:` step could allow an attacker to inject their own code into the runner. This would allow them to steal secrets and code. `github` context data can have arbitrary user input and should be treated as untrusted. Instead, use an intermediate environment variable with `env:` to store the data and use the environment variable in the `run:` script. Be sure to use double-quotes the environment variable, like this: \"$ENVVAR\".",
+            "description": "Using variable interpolation `${{...}}` with `github` context data in a `run:` step could allow an attacker to inject their own code into the runner. This would allow them to steal secrets and code. `github` context data can have arbitrary user input and should be treated as untrusted. Instead, use an intermediate environment variable with `env:` to store the data and use the environment variable in the `run:` script. Be sure to use double-quotes the environment variable, like this: \"$ENVVAR\".",
+            "severity": "High",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": ".github/workflows/update-challenges-ebook.yml",
+                "start_line": 22,
+                "end_line": 25
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - yaml.github-actions.security.run-shell-injection.run-shell-injection",
+                    "value": "yaml.github-actions.security.run-shell-injection.run-shell-injection",
+                    "url": "https://semgrep.dev/r/yaml.github-actions.security.run-shell-injection.run-shell-injection"
+                }
+            ],
+            "flags": [],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "HIGH"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "d0d2b0aa-b550-02eb-f46f-7df84693637f",
+            "cve": ".github/workflows/update-challenges-www-legacy.yml:4cafb2a9d70742f46565ffdaf04e3d74b28dc4dd1527c145df42d2528f5b6b21:yaml.github-actions.security.run-shell-injection.run-shell-injection",
+            "message": "Using variable interpolation `${{...}}` with `github` context data in a `run:` step could allow an attacker to inject their own code into the runner. This would allow them to steal secrets and code. `github` context data can have arbitrary user input and should be treated as untrusted. Instead, use an intermediate environment variable with `env:` to store the data and use the environment variable in the `run:` script. Be sure to use double-quotes the environment variable, like this: \"$ENVVAR\".",
+            "description": "Using variable interpolation `${{...}}` with `github` context data in a `run:` step could allow an attacker to inject their own code into the runner. This would allow them to steal secrets and code. `github` context data can have arbitrary user input and should be treated as untrusted. Instead, use an intermediate environment variable with `env:` to store the data and use the environment variable in the `run:` script. Be sure to use double-quotes the environment variable, like this: \"$ENVVAR\".",
+            "severity": "High",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": ".github/workflows/update-challenges-www-legacy.yml",
+                "start_line": 27,
+                "end_line": 34
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - yaml.github-actions.security.run-shell-injection.run-shell-injection",
+                    "value": "yaml.github-actions.security.run-shell-injection.run-shell-injection",
+                    "url": "https://semgrep.dev/r/yaml.github-actions.security.run-shell-injection.run-shell-injection"
+                }
+            ],
+            "flags": [],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "HIGH"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "ef12eb84-913a-7651-61d9-7dd14fb6da89",
+            "cve": ".github/workflows/update-challenges-www-legacy.yml:4cafb2a9d70742f46565ffdaf04e3d74b28dc4dd1527c145df42d2528f5b6b21:yaml.github-actions.security.run-shell-injection.run-shell-injection",
+            "message": "Using variable interpolation `${{...}}` with `github` context data in a `run:` step could allow an attacker to inject their own code into the runner. This would allow them to steal secrets and code. `github` context data can have arbitrary user input and should be treated as untrusted. Instead, use an intermediate environment variable with `env:` to store the data and use the environment variable in the `run:` script. Be sure to use double-quotes the environment variable, like this: \"$ENVVAR\".",
+            "description": "Using variable interpolation `${{...}}` with `github` context data in a `run:` step could allow an attacker to inject their own code into the runner. This would allow them to steal secrets and code. `github` context data can have arbitrary user input and should be treated as untrusted. Instead, use an intermediate environment variable with `env:` to store the data and use the environment variable in the `run:` script. Be sure to use double-quotes the environment variable, like this: \"$ENVVAR\".",
+            "severity": "High",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": ".github/workflows/update-challenges-www-legacy.yml",
+                "start_line": 36,
+                "end_line": 44
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - yaml.github-actions.security.run-shell-injection.run-shell-injection",
+                    "value": "yaml.github-actions.security.run-shell-injection.run-shell-injection",
+                    "url": "https://semgrep.dev/r/yaml.github-actions.security.run-shell-injection.run-shell-injection"
+                }
+            ],
+            "flags": [],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "HIGH"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "21eb1e57-cb73-f145-d3d0-503fe079e3ac",
+            "cve": ".github/workflows/update-challenges-www.yml:1c4ce6a1665db7bd37fc9e9af761af743138cb03372477ad078510e8845127c5:yaml.github-actions.security.run-shell-injection.run-shell-injection",
+            "message": "Using variable interpolation `${{...}}` with `github` context data in a `run:` step could allow an attacker to inject their own code into the runner. This would allow them to steal secrets and code. `github` context data can have arbitrary user input and should be treated as untrusted. Instead, use an intermediate environment variable with `env:` to store the data and use the environment variable in the `run:` script. Be sure to use double-quotes the environment variable, like this: \"$ENVVAR\".",
+            "description": "Using variable interpolation `${{...}}` with `github` context data in a `run:` step could allow an attacker to inject their own code into the runner. This would allow them to steal secrets and code. `github` context data can have arbitrary user input and should be treated as untrusted. Instead, use an intermediate environment variable with `env:` to store the data and use the environment variable in the `run:` script. Be sure to use double-quotes the environment variable, like this: \"$ENVVAR\".",
+            "severity": "High",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": ".github/workflows/update-challenges-www.yml",
+                "start_line": 27,
+                "end_line": 34
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - yaml.github-actions.security.run-shell-injection.run-shell-injection",
+                    "value": "yaml.github-actions.security.run-shell-injection.run-shell-injection",
+                    "url": "https://semgrep.dev/r/yaml.github-actions.security.run-shell-injection.run-shell-injection"
+                }
+            ],
+            "flags": [],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "HIGH"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "e55aceef-6fb9-b96e-459e-9a3456cae125",
+            "cve": ".github/workflows/update-challenges-www.yml:1c4ce6a1665db7bd37fc9e9af761af743138cb03372477ad078510e8845127c5:yaml.github-actions.security.run-shell-injection.run-shell-injection",
+            "message": "Using variable interpolation `${{...}}` with `github` context data in a `run:` step could allow an attacker to inject their own code into the runner. This would allow them to steal secrets and code. `github` context data can have arbitrary user input and should be treated as untrusted. Instead, use an intermediate environment variable with `env:` to store the data and use the environment variable in the `run:` script. Be sure to use double-quotes the environment variable, like this: \"$ENVVAR\".",
+            "description": "Using variable interpolation `${{...}}` with `github` context data in a `run:` step could allow an attacker to inject their own code into the runner. This would allow them to steal secrets and code. `github` context data can have arbitrary user input and should be treated as untrusted. Instead, use an intermediate environment variable with `env:` to store the data and use the environment variable in the `run:` script. Be sure to use double-quotes the environment variable, like this: \"$ENVVAR\".",
+            "severity": "High",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": ".github/workflows/update-challenges-www.yml",
+                "start_line": 36,
+                "end_line": 44
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - yaml.github-actions.security.run-shell-injection.run-shell-injection",
+                    "value": "yaml.github-actions.security.run-shell-injection.run-shell-injection",
+                    "url": "https://semgrep.dev/r/yaml.github-actions.security.run-shell-injection.run-shell-injection"
+                }
+            ],
+            "flags": [],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "HIGH"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "8c2b3ebb-508b-7902-0a8a-4e76a0da69c2",
+            "cve": "coverage/lcov-report/prettify.js:ae24634710e0d33d749fc65952dbf8e2932fd5e8951ff596c6b5221ed50872e4:javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp",
+            "message": "RegExp() called with a `T` function argument, this might allow an attacker to cause a Regular Expression Denial-of-Service (ReDoS) within your application as RegExP blocks the main thread. For this reason, it is recommended to use hardcoded regexes instead. If your regex is run on user-controlled input, consider performing input validation or use a regex checking/sanitization library such as https://www.npmjs.com/package/recheck to verify that the regex does not appear vulnerable to ReDoS.",
+            "description": "RegExp() called with a `T` function argument, this might allow an attacker to cause a Regular Expression Denial-of-Service (ReDoS) within your application as RegExP blocks the main thread. For this reason, it is recommended to use hardcoded regexes instead. If your regex is run on user-controlled input, consider performing input validation or use a regex checking/sanitization library such as https://www.npmjs.com/package/recheck to verify that the regex does not appear vulnerable to ReDoS.",
+            "severity": "Medium",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "coverage/lcov-report/prettify.js",
+                "start_line": 2,
+                "end_line": 2
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp",
+                    "value": "javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp",
+                    "url": "https://semgrep.dev/r/javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp"
+                }
+            ],
+            "flags": [
+                {
+                    "type": "flagged-as-likely-false-positive",
+                    "origin": "Semgrep",
+                    "description": "This finding is from a low confidence rule."
+                }
+            ],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "LOW"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "c6be3b47-6a01-012e-111d-16d89cf4cdaa",
+            "cve": "data/static/codefixes/dbSchemaChallenge_1.ts:81cc58cc7d06bb4e8791e0d163c2c917474040b2edfe2e60f9b35bf8dbb79897:javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection",
+            "message": "Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it is recommended to use parameterized queries or prepared statements.",
+            "description": "Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it is recommended to use parameterized queries or prepared statements.",
+            "severity": "High",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "data/static/codefixes/dbSchemaChallenge_1.ts",
+                "start_line": 5,
+                "end_line": 5
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection",
+                    "value": "javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection",
+                    "url": "https://semgrep.dev/r/javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection"
+                }
+            ],
+            "flags": [],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "HIGH"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "5a4a5daa-dc9a-9879-0579-c51bcd52aeda",
+            "cve": "data/static/codefixes/dbSchemaChallenge_3.ts:96d70666ee3e2559dd9da542cf13cdfd38d1859f61b29a94004291fce2e4b03b:javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection",
+            "message": "Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it is recommended to use parameterized queries or prepared statements.",
+            "description": "Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it is recommended to use parameterized queries or prepared statements.",
+            "severity": "High",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "data/static/codefixes/dbSchemaChallenge_3.ts",
+                "start_line": 11,
+                "end_line": 11
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection",
+                    "value": "javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection",
+                    "url": "https://semgrep.dev/r/javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection"
+                }
+            ],
+            "flags": [],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "HIGH"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "cd644b55-93a1-96a2-ce90-100466df56ba",
+            "cve": "data/static/codefixes/restfulXssChallenge_2.ts:05741c4bb1de4f7275685d7f452f201558221fbbeb43a020c09d8d48bf893146:javascript.audit.detect-replaceall-sanitization.detect-replaceall-sanitization",
+            "message": "Detected a call to `replaceAll()` in an attempt to HTML escape the string `tableData[i].description`. Manually sanitizing input through a manually built list can be circumvented in many situations, and it's better to use a well known sanitization library such as `sanitize-html` or `DOMPurify`.",
+            "description": "Detected a call to `replaceAll()` in an attempt to HTML escape the string `tableData[i].description`. Manually sanitizing input through a manually built list can be circumvented in many situations, and it's better to use a well known sanitization library such as `sanitize-html` or `DOMPurify`.",
+            "severity": "Info",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "data/static/codefixes/restfulXssChallenge_2.ts",
+                "start_line": 49,
+                "end_line": 49
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.audit.detect-replaceall-sanitization.detect-replaceall-sanitization",
+                    "value": "javascript.audit.detect-replaceall-sanitization.detect-replaceall-sanitization",
+                    "url": "https://semgrep.dev/r/javascript.audit.detect-replaceall-sanitization.detect-replaceall-sanitization"
+                }
+            ],
+            "flags": [
+                {
+                    "type": "flagged-as-likely-false-positive",
+                    "origin": "Semgrep",
+                    "description": "This finding is from a low confidence rule."
+                }
+            ],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "LOW"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "cd644b55-93a1-96a2-ce90-100466df56ba",
+            "cve": "data/static/codefixes/restfulXssChallenge_2.ts:05741c4bb1de4f7275685d7f452f201558221fbbeb43a020c09d8d48bf893146:javascript.audit.detect-replaceall-sanitization.detect-replaceall-sanitization",
+            "message": "Detected a call to `replaceAll()` in an attempt to HTML escape the string `tableData[i].description.replaceAll('<', '&lt;')`. Manually sanitizing input through a manually built list can be circumvented in many situations, and it's better to use a well known sanitization library such as `sanitize-html` or `DOMPurify`.",
+            "description": "Detected a call to `replaceAll()` in an attempt to HTML escape the string `tableData[i].description.replaceAll('<', '&lt;')`. Manually sanitizing input through a manually built list can be circumvented in many situations, and it's better to use a well known sanitization library such as `sanitize-html` or `DOMPurify`.",
+            "severity": "Info",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "data/static/codefixes/restfulXssChallenge_2.ts",
+                "start_line": 49,
+                "end_line": 49
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.audit.detect-replaceall-sanitization.detect-replaceall-sanitization",
+                    "value": "javascript.audit.detect-replaceall-sanitization.detect-replaceall-sanitization",
+                    "url": "https://semgrep.dev/r/javascript.audit.detect-replaceall-sanitization.detect-replaceall-sanitization"
+                }
+            ],
+            "flags": [
+                {
+                    "type": "flagged-as-likely-false-positive",
+                    "origin": "Semgrep",
+                    "description": "This finding is from a low confidence rule."
+                }
+            ],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "LOW"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "ab421f76-e82b-7141-5411-6218ebcee65f",
+            "cve": "data/static/codefixes/unionSqlInjectionChallenge_1.ts:2c3e67af4a9425c1fa751926525a27295fee09be0f4be1c6ebfd9e4ba5695479:javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection",
+            "message": "Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it is recommended to use parameterized queries or prepared statements.",
+            "description": "Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it is recommended to use parameterized queries or prepared statements.",
+            "severity": "High",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "data/static/codefixes/unionSqlInjectionChallenge_1.ts",
+                "start_line": 6,
+                "end_line": 6
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection",
+                    "value": "javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection",
+                    "url": "https://semgrep.dev/r/javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection"
+                }
+            ],
+            "flags": [],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "HIGH"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "c409ef94-1eec-3008-da6e-1fd347e793aa",
+            "cve": "data/static/codefixes/unionSqlInjectionChallenge_3.ts:8340472dca1fa8711209ef9ed16206fee35ab3c525466f0898e00d80afc47644:javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection",
+            "message": "Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it is recommended to use parameterized queries or prepared statements.",
+            "description": "Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it is recommended to use parameterized queries or prepared statements.",
+            "severity": "High",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "data/static/codefixes/unionSqlInjectionChallenge_3.ts",
+                "start_line": 10,
+                "end_line": 10
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection",
+                    "value": "javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection",
+                    "url": "https://semgrep.dev/r/javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection"
+                }
+            ],
+            "flags": [],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "HIGH"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "b9a45df0-ea0c-fc00-4eb4-3ceca1dcc069",
+            "cve": "data/static/users.yml:836751a1a3a58632f012ccf114dfe88b46a3a0850f9a3008a03a434da61904f4:generic.secrets.security.detected-generic-secret.detected-generic-secret",
+            "message": "Generic Secret detected",
+            "description": "Generic Secret detected",
+            "severity": "High",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "data/static/users.yml",
+                "start_line": 151,
+                "end_line": 151
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - generic.secrets.security.detected-generic-secret.detected-generic-secret",
+                    "value": "generic.secrets.security.detected-generic-secret.detected-generic-secret",
+                    "url": "https://semgrep.dev/r/generic.secrets.security.detected-generic-secret.detected-generic-secret"
+                }
+            ],
+            "flags": [
+                {
+                    "type": "flagged-as-likely-false-positive",
+                    "origin": "Semgrep",
+                    "description": "This finding is from a low confidence rule."
+                }
+            ],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "LOW"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "ad549e1f-7975-8220-a96f-5a8cfbfcea96",
+            "cve": "frontend/src/app/app.guard.spec.ts:d6f86621772d0b4d91f6d2003ee5542c93074cebe9f3d7a50f11e9638397b9dc:generic.secrets.security.detected-jwt-token.detected-jwt-token",
+            "message": "JWT token detected",
+            "description": "JWT token detected",
+            "severity": "High",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "frontend/src/app/app.guard.spec.ts",
+                "start_line": 38,
+                "end_line": 38
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - generic.secrets.security.detected-jwt-token.detected-jwt-token",
+                    "value": "generic.secrets.security.detected-jwt-token.detected-jwt-token",
+                    "url": "https://semgrep.dev/r/generic.secrets.security.detected-jwt-token.detected-jwt-token"
+                }
+            ],
+            "flags": [
+                {
+                    "type": "flagged-as-likely-false-positive",
+                    "origin": "Semgrep",
+                    "description": "This finding is from a low confidence rule."
+                }
+            ],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "LOW"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "7192652c-9413-45b8-d066-62ca3a7edb14",
+            "cve": "frontend/src/app/last-login-ip/last-login-ip.component.spec.ts:8f5cd87cf30191296acf3a1ea7a78ff0582113028277e2dc646eb77d3fc0a988:generic.secrets.security.detected-jwt-token.detected-jwt-token",
+            "message": "JWT token detected",
+            "description": "JWT token detected",
+            "severity": "High",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "frontend/src/app/last-login-ip/last-login-ip.component.spec.ts",
+                "start_line": 61,
+                "end_line": 61
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - generic.secrets.security.detected-jwt-token.detected-jwt-token",
+                    "value": "generic.secrets.security.detected-jwt-token.detected-jwt-token",
+                    "url": "https://semgrep.dev/r/generic.secrets.security.detected-jwt-token.detected-jwt-token"
+                }
+            ],
+            "flags": [
+                {
+                    "type": "flagged-as-likely-false-positive",
+                    "origin": "Semgrep",
+                    "description": "This finding is from a low confidence rule."
+                }
+            ],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "LOW"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "f06a5a09-fdfb-5212-8ab1-f3ca93ff8529",
+            "cve": "frontend/src/app/last-login-ip/last-login-ip.component.spec.ts:8f5cd87cf30191296acf3a1ea7a78ff0582113028277e2dc646eb77d3fc0a988:generic.secrets.security.detected-jwt-token.detected-jwt-token",
+            "message": "JWT token detected",
+            "description": "JWT token detected",
+            "severity": "High",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "frontend/src/app/last-login-ip/last-login-ip.component.spec.ts",
+                "start_line": 67,
+                "end_line": 67
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - generic.secrets.security.detected-jwt-token.detected-jwt-token",
+                    "value": "generic.secrets.security.detected-jwt-token.detected-jwt-token",
+                    "url": "https://semgrep.dev/r/generic.secrets.security.detected-jwt-token.detected-jwt-token"
+                }
+            ],
+            "flags": [
+                {
+                    "type": "flagged-as-likely-false-positive",
+                    "origin": "Semgrep",
+                    "description": "This finding is from a low confidence rule."
+                }
+            ],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "LOW"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "d80d7d7f-aba1-08a8-4b14-cadfe47ec156",
+            "cve": "frontend/src/hacking-instructor/helpers/helpers.ts:33d7c62d2179411c6c4889437eabce480972a3a61f4054f59ad93e1e77cd3035:javascript.lang.security.audit.prototype-pollution.prototype-pollution-loop.prototype-pollution-loop",
+            "message": "Possibility of prototype polluting function detected. By adding or modifying attributes of an object prototype, it is possible to create attributes that exist on every object, or replace critical attributes with malicious ones. This can be problematic if the software depends on existence or non-existence of certain attributes, or uses pre-defined attributes of object prototype (such as hasOwnProperty, toString or valueOf). Possible mitigations might be: freezing the object prototype, using an object without prototypes (via Object.create(null) ), blocking modifications of attributes that resolve to object prototype, using Map instead of object.",
+            "description": "Possibility of prototype polluting function detected. By adding or modifying attributes of an object prototype, it is possible to create attributes that exist on every object, or replace critical attributes with malicious ones. This can be problematic if the software depends on existence or non-existence of certain attributes, or uses pre-defined attributes of object prototype (such as hasOwnProperty, toString or valueOf). Possible mitigations might be: freezing the object prototype, using an object without prototypes (via Object.create(null) ), blocking modifications of attributes that resolve to object prototype, using Map instead of object.",
+            "severity": "Medium",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "frontend/src/hacking-instructor/helpers/helpers.ts",
+                "start_line": 49,
+                "end_line": 49
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.lang.security.audit.prototype-pollution.prototype-pollution-loop.prototype-pollution-loop",
+                    "value": "javascript.lang.security.audit.prototype-pollution.prototype-pollution-loop.prototype-pollution-loop",
+                    "url": "https://semgrep.dev/r/javascript.lang.security.audit.prototype-pollution.prototype-pollution-loop.prototype-pollution-loop"
+                }
+            ],
+            "flags": [
+                {
+                    "type": "flagged-as-likely-false-positive",
+                    "origin": "Semgrep",
+                    "description": "This finding is from a low confidence rule."
+                }
+            ],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "LOW"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "c671b872-03c8-a1db-022e-8b48091ee936",
+            "cve": "lib/codingChallenges.ts:72d74454241c2d72e6f2d8c8c47bc0c81d84d6484c25efd10554b4fe7ed35404:javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp",
+            "message": "RegExp() called with a `challengeKey` function argument, this might allow an attacker to cause a Regular Expression Denial-of-Service (ReDoS) within your application as RegExP blocks the main thread. For this reason, it is recommended to use hardcoded regexes instead. If your regex is run on user-controlled input, consider performing input validation or use a regex checking/sanitization library such as https://www.npmjs.com/package/recheck to verify that the regex does not appear vulnerable to ReDoS.",
+            "description": "RegExp() called with a `challengeKey` function argument, this might allow an attacker to cause a Regular Expression Denial-of-Service (ReDoS) within your application as RegExP blocks the main thread. For this reason, it is recommended to use hardcoded regexes instead. If your regex is run on user-controlled input, consider performing input validation or use a regex checking/sanitization library such as https://www.npmjs.com/package/recheck to verify that the regex does not appear vulnerable to ReDoS.",
+            "severity": "Medium",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "lib/codingChallenges.ts",
+                "start_line": 76,
+                "end_line": 76
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp",
+                    "value": "javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp",
+                    "url": "https://semgrep.dev/r/javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp"
+                }
+            ],
+            "flags": [
+                {
+                    "type": "flagged-as-likely-false-positive",
+                    "origin": "Semgrep",
+                    "description": "This finding is from a low confidence rule."
+                }
+            ],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "LOW"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "1a9f3e6d-9a81-54cd-a7aa-67b5bcff64b9",
+            "cve": "lib/codingChallenges.ts:72d74454241c2d72e6f2d8c8c47bc0c81d84d6484c25efd10554b4fe7ed35404:javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp",
+            "message": "RegExp() called with a `challengeKey` function argument, this might allow an attacker to cause a Regular Expression Denial-of-Service (ReDoS) within your application as RegExP blocks the main thread. For this reason, it is recommended to use hardcoded regexes instead. If your regex is run on user-controlled input, consider performing input validation or use a regex checking/sanitization library such as https://www.npmjs.com/package/recheck to verify that the regex does not appear vulnerable to ReDoS.",
+            "description": "RegExp() called with a `challengeKey` function argument, this might allow an attacker to cause a Regular Expression Denial-of-Service (ReDoS) within your application as RegExP blocks the main thread. For this reason, it is recommended to use hardcoded regexes instead. If your regex is run on user-controlled input, consider performing input validation or use a regex checking/sanitization library such as https://www.npmjs.com/package/recheck to verify that the regex does not appear vulnerable to ReDoS.",
+            "severity": "Medium",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "lib/codingChallenges.ts",
+                "start_line": 78,
+                "end_line": 78
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp",
+                    "value": "javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp",
+                    "url": "https://semgrep.dev/r/javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp"
+                }
+            ],
+            "flags": [
+                {
+                    "type": "flagged-as-likely-false-positive",
+                    "origin": "Semgrep",
+                    "description": "This finding is from a low confidence rule."
+                }
+            ],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "LOW"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "40228457-84f0-5a6d-d46d-d493af6d1b2f",
+            "cve": "lib/insecurity.ts:4b68d0a42c1de76b7655454380740256741a71fc288542416559db2654949c67:javascript.lang.security.audit.hardcoded-hmac-key.hardcoded-hmac-key",
+            "message": "Detected a hardcoded hmac key. Avoid hardcoding secrets and consider using an alternate option such as reading the secret from a config file or using an environment variable.",
+            "description": "Detected a hardcoded hmac key. Avoid hardcoding secrets and consider using an alternate option such as reading the secret from a config file or using an environment variable.",
+            "severity": "Medium",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "lib/insecurity.ts",
+                "start_line": 44,
+                "end_line": 44
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.lang.security.audit.hardcoded-hmac-key.hardcoded-hmac-key",
+                    "value": "javascript.lang.security.audit.hardcoded-hmac-key.hardcoded-hmac-key",
+                    "url": "https://semgrep.dev/r/javascript.lang.security.audit.hardcoded-hmac-key.hardcoded-hmac-key"
+                }
+            ],
+            "flags": [
+                {
+                    "type": "flagged-as-likely-false-positive",
+                    "origin": "Semgrep",
+                    "description": "This finding is from a low confidence rule."
+                }
+            ],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "LOW"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "c0dcbfab-0841-3a24-a0d4-95835aef19ff",
+            "cve": "lib/insecurity.ts:4b68d0a42c1de76b7655454380740256741a71fc288542416559db2654949c67:javascript.jsonwebtoken.security.jwt-hardcode.hardcoded-jwt-secret",
+            "message": "A hard-coded credential was detected. It is not recommended to store credentials in source-code, as this risks secrets being leaked and used by either an internal or external malicious adversary. It is recommended to use environment variables to securely provide credentials or retrieve credentials from a secure vault or HSM (Hardware Security Module).",
+            "description": "A hard-coded credential was detected. It is not recommended to store credentials in source-code, as this risks secrets being leaked and used by either an internal or external malicious adversary. It is recommended to use environment variables to securely provide credentials or retrieve credentials from a secure vault or HSM (Hardware Security Module).",
+            "severity": "Medium",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "lib/insecurity.ts",
+                "start_line": 56,
+                "end_line": 56
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.jsonwebtoken.security.jwt-hardcode.hardcoded-jwt-secret",
+                    "value": "javascript.jsonwebtoken.security.jwt-hardcode.hardcoded-jwt-secret",
+                    "url": "https://semgrep.dev/r/javascript.jsonwebtoken.security.jwt-hardcode.hardcoded-jwt-secret"
+                }
+            ],
+            "flags": [],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "HIGH"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "ab070d73-ef4d-45ec-94db-646846801bc3",
+            "cve": "lib/insecurity.ts:4b68d0a42c1de76b7655454380740256741a71fc288542416559db2654949c67:javascript.lang.security.audit.hardcoded-hmac-key.hardcoded-hmac-key",
+            "message": "Detected a hardcoded hmac key. Avoid hardcoding secrets and consider using an alternate option such as reading the secret from a config file or using an environment variable.",
+            "description": "Detected a hardcoded hmac key. Avoid hardcoding secrets and consider using an alternate option such as reading the secret from a config file or using an environment variable.",
+            "severity": "Medium",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "lib/insecurity.ts",
+                "start_line": 152,
+                "end_line": 152
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.lang.security.audit.hardcoded-hmac-key.hardcoded-hmac-key",
+                    "value": "javascript.lang.security.audit.hardcoded-hmac-key.hardcoded-hmac-key",
+                    "url": "https://semgrep.dev/r/javascript.lang.security.audit.hardcoded-hmac-key.hardcoded-hmac-key"
+                }
+            ],
+            "flags": [
+                {
+                    "type": "flagged-as-likely-false-positive",
+                    "origin": "Semgrep",
+                    "description": "This finding is from a low confidence rule."
+                }
+            ],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "LOW"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "b310fb71-0e17-d1c2-b648-3072ce383971",
+            "cve": "routes/b2bOrder.ts:b757aa7268524fad4d7752833aa635eb8c76421e6a88562ff10e6035526ac353:javascript.express.security.audit.express-detect-notevil-usage.express-detect-notevil-usage",
+            "message": "Detected usage of the `notevil` package, which is unmaintained and has vulnerabilities. Using any sort of `eval()` functionality can be very dangerous, but if you must, the `eval` package is an up to date alternative. Be sure that only trusted input reaches an `eval()` function.",
+            "description": "Detected usage of the `notevil` package, which is unmaintained and has vulnerabilities. Using any sort of `eval()` functionality can be very dangerous, but if you must, the `eval` package is an up to date alternative. Be sure that only trusted input reaches an `eval()` function.",
+            "severity": "Medium",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "routes/b2bOrder.ts",
+                "start_line": 23,
+                "end_line": 23
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.express.security.audit.express-detect-notevil-usage.express-detect-notevil-usage",
+                    "value": "javascript.express.security.audit.express-detect-notevil-usage.express-detect-notevil-usage",
+                    "url": "https://semgrep.dev/r/javascript.express.security.audit.express-detect-notevil-usage.express-detect-notevil-usage"
+                }
+            ],
+            "flags": [
+                {
+                    "type": "flagged-as-likely-false-positive",
+                    "origin": "Semgrep",
+                    "description": "This finding is from a low confidence rule."
+                }
+            ],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "LOW"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "73c41523-219f-252e-ff52-bcb0aa3309e8",
+            "cve": "routes/captcha.ts:4b2cb219ebf2a5a25bf9fa17e0c124870c7d4fdaed2f0bb362836b1663045015:javascript.browser.security.eval-detected.eval-detected",
+            "message": "Detected the use of eval(). eval() can be dangerous if used to evaluate dynamic content. If this content can be input from outside the program, this may be a code injection vulnerability. Ensure evaluated content is not definable by external sources.",
+            "description": "Detected the use of eval(). eval() can be dangerous if used to evaluate dynamic content. If this content can be input from outside the program, this may be a code injection vulnerability. Ensure evaluated content is not definable by external sources.",
+            "severity": "Medium",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "routes/captcha.ts",
+                "start_line": 22,
+                "end_line": 22
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.browser.security.eval-detected.eval-detected",
+                    "value": "javascript.browser.security.eval-detected.eval-detected",
+                    "url": "https://semgrep.dev/r/javascript.browser.security.eval-detected.eval-detected"
+                }
+            ],
+            "flags": [
+                {
+                    "type": "flagged-as-likely-false-positive",
+                    "origin": "Semgrep",
+                    "description": "This finding is from a low confidence rule."
+                }
+            ],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "LOW"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "a98aa6e9-9dbe-3c4c-24f9-945a2b4720c1",
+            "cve": "routes/chatbot.ts:eeedaa605ec448adc4af12f3c40817bd7ea32c226ae9d31b80c08a2b75d9922e:javascript.express.security.injection.raw-html-format.raw-html-format",
+            "message": "User data flows into the host portion of this manually-constructed HTML. This can introduce a Cross-Site-Scripting (XSS) vulnerability if this comes from user-provided input. Consider using a sanitization library such as DOMPurify to sanitize the HTML within.",
+            "description": "User data flows into the host portion of this manually-constructed HTML. This can introduce a Cross-Site-Scripting (XSS) vulnerability if this comes from user-provided input. Consider using a sanitization library such as DOMPurify to sanitize the HTML within.",
+            "severity": "Medium",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "routes/chatbot.ts",
+                "start_line": 205,
+                "end_line": 205
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.express.security.injection.raw-html-format.raw-html-format",
+                    "value": "javascript.express.security.injection.raw-html-format.raw-html-format",
+                    "url": "https://semgrep.dev/r/javascript.express.security.injection.raw-html-format.raw-html-format"
+                }
+            ],
+            "flags": [],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "MEDIUM"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "23de4c9e-4c74-d277-01be-804e59542944",
+            "cve": "routes/currentUser.ts:a99ab2ca196139f518991aa2d1a126563bc125270affa99b453a0257427cf2cc:javascript.express.security.audit.remote-property-injection.remote-property-injection",
+            "message": "Bracket object notation with user input is present, this might allow an attacker to access all properties of the object and even it's prototype. Use literal values for object properties.",
+            "description": "Bracket object notation with user input is present, this might allow an attacker to access all properties of the object and even it's prototype. Use literal values for object properties.",
+            "severity": "High",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "routes/currentUser.ts",
+                "start_line": 31,
+                "end_line": 31
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.express.security.audit.remote-property-injection.remote-property-injection",
+                    "value": "javascript.express.security.audit.remote-property-injection.remote-property-injection",
+                    "url": "https://semgrep.dev/r/javascript.express.security.audit.remote-property-injection.remote-property-injection"
+                }
+            ],
+            "flags": [
+                {
+                    "type": "flagged-as-likely-false-positive",
+                    "origin": "Semgrep",
+                    "description": "This finding is from a low confidence rule."
+                }
+            ],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "LOW"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "e79e3e2b-9e8e-b21e-be8d-d90627dfcc62",
+            "cve": "routes/fileServer.ts:40843724b025e34f733fb783571c66c60038ec2dc75d31429ede85503b05f3a4:javascript.express.security.audit.express-res-sendfile.express-res-sendfile",
+            "message": "The application processes user-input, this is passed to res.sendFile which can allow an attacker to arbitrarily read files on the system through path traversal. It is recommended to perform input validation in addition to canonicalizing the path. This allows you to validate the path against the intended directory it should be accessing.",
+            "description": "The application processes user-input, this is passed to res.sendFile which can allow an attacker to arbitrarily read files on the system through path traversal. It is recommended to perform input validation in addition to canonicalizing the path. This allows you to validate the path against the intended directory it should be accessing.",
+            "severity": "Medium",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "routes/fileServer.ts",
+                "start_line": 33,
+                "end_line": 33
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.express.security.audit.express-res-sendfile.express-res-sendfile",
+                    "value": "javascript.express.security.audit.express-res-sendfile.express-res-sendfile",
+                    "url": "https://semgrep.dev/r/javascript.express.security.audit.express-res-sendfile.express-res-sendfile"
+                }
+            ],
+            "flags": [],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "MEDIUM"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "0e10de1a-aead-0851-e87f-ec886b870a4c",
+            "cve": "routes/fileUpload.ts:7890de7a9591c3aa08fe2bf8ffdb0cafb7746d4928fa441b4da65717226e4d56:javascript.express.security.audit.express-libxml-vm-noent.express-libxml-vm-noent",
+            "message": "Detected use of parseXml() function with the `noent` field set to `true`. This can lead to an XML External Entities (XXE) attack if untrusted data is passed into it.",
+            "description": "Detected use of parseXml() function with the `noent` field set to `true`. This can lead to an XML External Entities (XXE) attack if untrusted data is passed into it.",
+            "severity": "Medium",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "routes/fileUpload.ts",
+                "start_line": 83,
+                "end_line": 83
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.express.security.audit.express-libxml-vm-noent.express-libxml-vm-noent",
+                    "value": "javascript.express.security.audit.express-libxml-vm-noent.express-libxml-vm-noent",
+                    "url": "https://semgrep.dev/r/javascript.express.security.audit.express-libxml-vm-noent.express-libxml-vm-noent"
+                }
+            ],
+            "flags": [
+                {
+                    "type": "flagged-as-likely-false-positive",
+                    "origin": "Semgrep",
+                    "description": "This finding is from a low confidence rule."
+                }
+            ],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "LOW"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "95563a1c-c346-9690-36d1-7d258e71f248",
+            "cve": "routes/keyServer.ts:3191659d42a9a9688e703e7cd6782f6304c0afd4e224c747975acf06396637bc:javascript.express.security.audit.express-res-sendfile.express-res-sendfile",
+            "message": "The application processes user-input, this is passed to res.sendFile which can allow an attacker to arbitrarily read files on the system through path traversal. It is recommended to perform input validation in addition to canonicalizing the path. This allows you to validate the path against the intended directory it should be accessing.",
+            "description": "The application processes user-input, this is passed to res.sendFile which can allow an attacker to arbitrarily read files on the system through path traversal. It is recommended to perform input validation in addition to canonicalizing the path. This allows you to validate the path against the intended directory it should be accessing.",
+            "severity": "Medium",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "routes/keyServer.ts",
+                "start_line": 14,
+                "end_line": 14
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.express.security.audit.express-res-sendfile.express-res-sendfile",
+                    "value": "javascript.express.security.audit.express-res-sendfile.express-res-sendfile",
+                    "url": "https://semgrep.dev/r/javascript.express.security.audit.express-res-sendfile.express-res-sendfile"
+                }
+            ],
+            "flags": [],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "MEDIUM"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "e2363ee6-1a5d-1ee3-a1d1-f3cc03b671f3",
+            "cve": "routes/logfileServer.ts:4e4a64d2be53e8994bd49613acc80ace9587afaabff52c248d812c22f73335ef:javascript.express.security.audit.express-res-sendfile.express-res-sendfile",
+            "message": "The application processes user-input, this is passed to res.sendFile which can allow an attacker to arbitrarily read files on the system through path traversal. It is recommended to perform input validation in addition to canonicalizing the path. This allows you to validate the path against the intended directory it should be accessing.",
+            "description": "The application processes user-input, this is passed to res.sendFile which can allow an attacker to arbitrarily read files on the system through path traversal. It is recommended to perform input validation in addition to canonicalizing the path. This allows you to validate the path against the intended directory it should be accessing.",
+            "severity": "Medium",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "routes/logfileServer.ts",
+                "start_line": 14,
+                "end_line": 14
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.express.security.audit.express-res-sendfile.express-res-sendfile",
+                    "value": "javascript.express.security.audit.express-res-sendfile.express-res-sendfile",
+                    "url": "https://semgrep.dev/r/javascript.express.security.audit.express-res-sendfile.express-res-sendfile"
+                }
+            ],
+            "flags": [],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "MEDIUM"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "85bda92c-1105-d740-d756-7c13e555352d",
+            "cve": "routes/login.ts:72a6577578e24be0f9c16aa6aaa3941524087ad61e1db15bff1243f8f5b612ce:javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection",
+            "message": "Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it is recommended to use parameterized queries or prepared statements.",
+            "description": "Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it is recommended to use parameterized queries or prepared statements.",
+            "severity": "High",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "routes/login.ts",
+                "start_line": 34,
+                "end_line": 34
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection",
+                    "value": "javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection",
+                    "url": "https://semgrep.dev/r/javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection"
+                }
+            ],
+            "flags": [],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "HIGH"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "b27f7221-5c27-9749-e1c7-6705cf00bf6f",
+            "cve": "routes/quarantineServer.ts:e2e40242bd9a588afab6b3b624c39471519f45511973a94cd28fc89dfca72e6b:javascript.express.security.audit.express-res-sendfile.express-res-sendfile",
+            "message": "The application processes user-input, this is passed to res.sendFile which can allow an attacker to arbitrarily read files on the system through path traversal. It is recommended to perform input validation in addition to canonicalizing the path. This allows you to validate the path against the intended directory it should be accessing.",
+            "description": "The application processes user-input, this is passed to res.sendFile which can allow an attacker to arbitrarily read files on the system through path traversal. It is recommended to perform input validation in addition to canonicalizing the path. This allows you to validate the path against the intended directory it should be accessing.",
+            "severity": "Medium",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "routes/quarantineServer.ts",
+                "start_line": 14,
+                "end_line": 14
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.express.security.audit.express-res-sendfile.express-res-sendfile",
+                    "value": "javascript.express.security.audit.express-res-sendfile.express-res-sendfile",
+                    "url": "https://semgrep.dev/r/javascript.express.security.audit.express-res-sendfile.express-res-sendfile"
+                }
+            ],
+            "flags": [],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "MEDIUM"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "eaa702fa-dc9e-a3ff-ce80-b20b9f2aa856",
+            "cve": "routes/redirect.ts:57d1f77ead1eab969732d693e8e09b39e79f4c84d51f636d0b3a385579dbbf3f:javascript.express.security.audit.express-open-redirect.express-open-redirect",
+            "message": "The application redirects to a URL specified by user-supplied input `query` that is not validated. This could redirect users to malicious locations. Consider using an allow-list approach to validate URLs, or warn users they are being redirected to a third-party website.",
+            "description": "The application redirects to a URL specified by user-supplied input `query` that is not validated. This could redirect users to malicious locations. Consider using an allow-list approach to validate URLs, or warn users they are being redirected to a third-party website.",
+            "severity": "Medium",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "routes/redirect.ts",
+                "start_line": 19,
+                "end_line": 19
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.express.security.audit.express-open-redirect.express-open-redirect",
+                    "value": "javascript.express.security.audit.express-open-redirect.express-open-redirect",
+                    "url": "https://semgrep.dev/r/javascript.express.security.audit.express-open-redirect.express-open-redirect"
+                }
+            ],
+            "flags": [],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "HIGH"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "5d7ba4f1-8852-f358-d353-acbf6293e076",
+            "cve": "routes/search.ts:d35652ee4d5603800838ad0b2376a81e83e8744a94d992b1556d1b7d265a7084:javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection",
+            "message": "Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it is recommended to use parameterized queries or prepared statements.",
+            "description": "Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it is recommended to use parameterized queries or prepared statements.",
+            "severity": "High",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "routes/search.ts",
+                "start_line": 23,
+                "end_line": 23
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection",
+                    "value": "javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection",
+                    "url": "https://semgrep.dev/r/javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection"
+                }
+            ],
+            "flags": [],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "HIGH"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "f8a4110f-ab17-9956-a440-4c53dac5eabe",
+            "cve": "routes/userProfile.ts:25bdb5578b6c6f1459620fb743927dccf1dc0a302fc6baf3769cd6da1afe3c11:javascript.browser.security.eval-detected.eval-detected",
+            "message": "Detected the use of eval(). eval() can be dangerous if used to evaluate dynamic content. If this content can be input from outside the program, this may be a code injection vulnerability. Ensure evaluated content is not definable by external sources.",
+            "description": "Detected the use of eval(). eval() can be dangerous if used to evaluate dynamic content. If this content can be input from outside the program, this may be a code injection vulnerability. Ensure evaluated content is not definable by external sources.",
+            "severity": "Medium",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "routes/userProfile.ts",
+                "start_line": 62,
+                "end_line": 62
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.browser.security.eval-detected.eval-detected",
+                    "value": "javascript.browser.security.eval-detected.eval-detected",
+                    "url": "https://semgrep.dev/r/javascript.browser.security.eval-detected.eval-detected"
+                }
+            ],
+            "flags": [
+                {
+                    "type": "flagged-as-likely-false-positive",
+                    "origin": "Semgrep",
+                    "description": "This finding is from a low confidence rule."
+                }
+            ],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "LOW"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "14fc142d-86a1-952b-4a35-a0d0bca1e2f4",
+            "cve": "routes/userProfile.ts:25bdb5578b6c6f1459620fb743927dccf1dc0a302fc6baf3769cd6da1afe3c11:javascript.lang.security.audit.code-string-concat.code-string-concat",
+            "message": "Found data from an Express or Next web request flowing to `eval`. If this data is user-controllable this can lead to execution of arbitrary system commands in the context of your application process. Avoid `eval` whenever possible.",
+            "description": "Found data from an Express or Next web request flowing to `eval`. If this data is user-controllable this can lead to execution of arbitrary system commands in the context of your application process. Avoid `eval` whenever possible.",
+            "severity": "High",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "routes/userProfile.ts",
+                "start_line": 62,
+                "end_line": 62
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.lang.security.audit.code-string-concat.code-string-concat",
+                    "value": "javascript.lang.security.audit.code-string-concat.code-string-concat",
+                    "url": "https://semgrep.dev/r/javascript.lang.security.audit.code-string-concat.code-string-concat"
+                }
+            ],
+            "flags": [],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "HIGH"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "f7202810-6b66-a0d8-62c6-cbe3453eca93",
+            "cve": "routes/videoHandler.ts:42e9ed6d8f152b5fc1b85c2a1438673ef982954b125bb90f29b69673a8fa4713:javascript.lang.security.audit.unknown-value-with-script-tag.unknown-value-with-script-tag",
+            "message": "Cannot determine what 'subs' is and it is used with a '<script>' tag. This could be susceptible to cross-site scripting (XSS). Ensure 'subs' is not externally controlled, or sanitize this data.",
+            "description": "Cannot determine what 'subs' is and it is used with a '<script>' tag. This could be susceptible to cross-site scripting (XSS). Ensure 'subs' is not externally controlled, or sanitize this data.",
+            "severity": "Medium",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "routes/videoHandler.ts",
+                "start_line": 58,
+                "end_line": 58
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.lang.security.audit.unknown-value-with-script-tag.unknown-value-with-script-tag",
+                    "value": "javascript.lang.security.audit.unknown-value-with-script-tag.unknown-value-with-script-tag",
+                    "url": "https://semgrep.dev/r/javascript.lang.security.audit.unknown-value-with-script-tag.unknown-value-with-script-tag"
+                }
+            ],
+            "flags": [
+                {
+                    "type": "flagged-as-likely-false-positive",
+                    "origin": "Semgrep",
+                    "description": "This finding is from a low confidence rule."
+                }
+            ],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "LOW"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "35361d43-5511-2aa5-127e-ebf706c6ae53",
+            "cve": "routes/videoHandler.ts:42e9ed6d8f152b5fc1b85c2a1438673ef982954b125bb90f29b69673a8fa4713:javascript.lang.security.audit.unknown-value-with-script-tag.unknown-value-with-script-tag",
+            "message": "Cannot determine what 'subs' is and it is used with a '<script>' tag. This could be susceptible to cross-site scripting (XSS). Ensure 'subs' is not externally controlled, or sanitize this data.",
+            "description": "Cannot determine what 'subs' is and it is used with a '<script>' tag. This could be susceptible to cross-site scripting (XSS). Ensure 'subs' is not externally controlled, or sanitize this data.",
+            "severity": "Medium",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "routes/videoHandler.ts",
+                "start_line": 71,
+                "end_line": 71
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.lang.security.audit.unknown-value-with-script-tag.unknown-value-with-script-tag",
+                    "value": "javascript.lang.security.audit.unknown-value-with-script-tag.unknown-value-with-script-tag",
+                    "url": "https://semgrep.dev/r/javascript.lang.security.audit.unknown-value-with-script-tag.unknown-value-with-script-tag"
+                }
+            ],
+            "flags": [
+                {
+                    "type": "flagged-as-likely-false-positive",
+                    "origin": "Semgrep",
+                    "description": "This finding is from a low confidence rule."
+                }
+            ],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "LOW"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "e4836c40-fbf6-3ac8-4686-1aa60585dddc",
+            "cve": "server.ts:1ba718c1eb8aa39cd20c2562d92523068c734d75f54655e97d652b992d9b4259:javascript.lang.security.audit.unsafe-formatstring.unsafe-formatstring",
+            "message": "Detected string concatenation with a non-literal variable in a util.format / console.log function. If an attacker injects a format specifier in the string, it will forge the log message. Try to use constant values for the format string.",
+            "description": "Detected string concatenation with a non-literal variable in a util.format / console.log function. If an attacker injects a format specifier in the string, it will forge the log message. Try to use constant values for the format string.",
+            "severity": "Info",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "server.ts",
+                "start_line": 155,
+                "end_line": 155
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.lang.security.audit.unsafe-formatstring.unsafe-formatstring",
+                    "value": "javascript.lang.security.audit.unsafe-formatstring.unsafe-formatstring",
+                    "url": "https://semgrep.dev/r/javascript.lang.security.audit.unsafe-formatstring.unsafe-formatstring"
+                }
+            ],
+            "flags": [
+                {
+                    "type": "flagged-as-likely-false-positive",
+                    "origin": "Semgrep",
+                    "description": "This finding is from a low confidence rule."
+                }
+            ],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "LOW"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "7e25a474-009a-a682-146e-0e783a58248b",
+            "cve": "server.ts:1ba718c1eb8aa39cd20c2562d92523068c734d75f54655e97d652b992d9b4259:javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing",
+            "message": "Directory listing/indexing is enabled, which may lead to disclosure of sensitive directories and files. It is recommended to disable directory listing unless it is a public resource. If you need directory listing, ensure that sensitive files are inaccessible when querying the resource.",
+            "description": "Directory listing/indexing is enabled, which may lead to disclosure of sensitive directories and files. It is recommended to disable directory listing unless it is a public resource. If you need directory listing, ensure that sensitive files are inaccessible when querying the resource.",
+            "severity": "Medium",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "server.ts",
+                "start_line": 269,
+                "end_line": 269
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing",
+                    "value": "javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing",
+                    "url": "https://semgrep.dev/r/javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing"
+                }
+            ],
+            "flags": [],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "MEDIUM"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "1987b0fe-d26d-1f57-2dee-a13f014d1f0e",
+            "cve": "server.ts:1ba718c1eb8aa39cd20c2562d92523068c734d75f54655e97d652b992d9b4259:javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing",
+            "message": "Directory listing/indexing is enabled, which may lead to disclosure of sensitive directories and files. It is recommended to disable directory listing unless it is a public resource. If you need directory listing, ensure that sensitive files are inaccessible when querying the resource.",
+            "description": "Directory listing/indexing is enabled, which may lead to disclosure of sensitive directories and files. It is recommended to disable directory listing unless it is a public resource. If you need directory listing, ensure that sensitive files are inaccessible when querying the resource.",
+            "severity": "Medium",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "server.ts",
+                "start_line": 273,
+                "end_line": 273
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing",
+                    "value": "javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing",
+                    "url": "https://semgrep.dev/r/javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing"
+                }
+            ],
+            "flags": [],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "MEDIUM"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "1a89298a-dbba-f7f8-8c2b-38d251494afe",
+            "cve": "server.ts:1ba718c1eb8aa39cd20c2562d92523068c734d75f54655e97d652b992d9b4259:javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing",
+            "message": "Directory listing/indexing is enabled, which may lead to disclosure of sensitive directories and files. It is recommended to disable directory listing unless it is a public resource. If you need directory listing, ensure that sensitive files are inaccessible when querying the resource.",
+            "description": "Directory listing/indexing is enabled, which may lead to disclosure of sensitive directories and files. It is recommended to disable directory listing unless it is a public resource. If you need directory listing, ensure that sensitive files are inaccessible when querying the resource.",
+            "severity": "Medium",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "server.ts",
+                "start_line": 277,
+                "end_line": 277
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing",
+                    "value": "javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing",
+                    "url": "https://semgrep.dev/r/javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing"
+                }
+            ],
+            "flags": [],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "MEDIUM"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "ac648159-b4a8-add4-93dd-55c4d298bad3",
+            "cve": "server.ts:1ba718c1eb8aa39cd20c2562d92523068c734d75f54655e97d652b992d9b4259:javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing",
+            "message": "Directory listing/indexing is enabled, which may lead to disclosure of sensitive directories and files. It is recommended to disable directory listing unless it is a public resource. If you need directory listing, ensure that sensitive files are inaccessible when querying the resource.",
+            "description": "Directory listing/indexing is enabled, which may lead to disclosure of sensitive directories and files. It is recommended to disable directory listing unless it is a public resource. If you need directory listing, ensure that sensitive files are inaccessible when querying the resource.",
+            "severity": "Medium",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "server.ts",
+                "start_line": 281,
+                "end_line": 281
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing",
+                    "value": "javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing",
+                    "url": "https://semgrep.dev/r/javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing"
+                }
+            ],
+            "flags": [],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "MEDIUM"
+                }
+            }
+        },
+        {
+            "category": "sast",
+            "id": "267673b3-84a2-4c1d-8794-5d3447c5951a",
+            "cve": "views/promotionVideo.pug:9aec90b54e98ccf588e9ffec82830ec2529fcf7ca9ee45db43714f90c5d54d34:javascript.express.security.audit.xss.pug.explicit-unescape.template-explicit-unescape",
+            "message": "Detected an explicit unescape in a Pug template, using either '!=' or '!{...}'. If external data can reach these locations, your application is exposed to a cross-site scripting (XSS) vulnerability. If you must do this, ensure no external data can reach this location.",
+            "description": "Detected an explicit unescape in a Pug template, using either '!=' or '!{...}'. If external data can reach these locations, your application is exposed to a cross-site scripting (XSS) vulnerability. If you must do this, ensure no external data can reach this location.",
+            "severity": "Medium",
+            "scanner": {
+                "id": "semgrep",
+                "name": "Semgrep",
+                "vendor": {
+                    "name": "Semgrep"
+                }
+            },
+            "location": {
+                "file": "views/promotionVideo.pug",
+                "start_line": 78,
+                "end_line": 78
+            },
+            "identifiers": [
+                {
+                    "type": "semgrep_type",
+                    "name": "Semgrep - javascript.express.security.audit.xss.pug.explicit-unescape.template-explicit-unescape",
+                    "value": "javascript.express.security.audit.xss.pug.explicit-unescape.template-explicit-unescape",
+                    "url": "https://semgrep.dev/r/javascript.express.security.audit.xss.pug.explicit-unescape.template-explicit-unescape"
+                }
+            ],
+            "flags": [
+                {
+                    "type": "flagged-as-likely-false-positive",
+                    "origin": "Semgrep",
+                    "description": "This finding is from a low confidence rule."
+                }
+            ],
+            "details": {
+                "confidence": {
+                    "type": "text",
+                    "name": "confidence",
+                    "value": "LOW"
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,198 @@
+stages:
+  - package
+  - sast
+  - sca-package
+  - sca-container
+  - publish
+  - deploy
+  - dast
+
+cache:
+  paths:
+    - .npm/
+# include:
+#   - template: Jobs/Secret-Detection.gitlab-ci.yml
+
+JuiceShop_package:
+  stage: package
+  image: node:20
+  cache:
+    paths:
+      - .npm/
+  script:
+    - cd OWASP_JuiceShop
+    - npm install --cache ../.npm --prefer-offline
+    - npm run build:frontend
+    - npm run build:server
+    - npm run package
+  artifacts:
+    paths:
+      - OWASP_JuiceShop/frontend/dist/
+      - OWASP_JuiceShop/build/
+      - OWASP_JuiceShop/dist/
+
+JuiceShop_semgrep-sast:
+  stage: sast
+  image: returntocorp/semgrep:latest
+
+  script:
+    - cd OWASP_JuiceShop
+    - mkdir -p report
+    - semgrep scan --config=auto --gitlab-sast --output report/raw-report.json .
+    - cat report/raw-report.json | python -m json.tool > report/gl-sast-report.json
+
+  artifacts:
+    when: always
+
+    paths:
+      - OWASP_JuiceShop/report/gl-sast-report.json
+
+    reports:
+      sast: OWASP_JuiceShop/report/gl-sast-report.json
+
+  allow_failure: true
+
+JuiceShop_gitleaks-report:
+  stage: sast
+
+  image:
+    name: zricethezav/gitleaks:latest
+    entrypoint: [""]
+
+  script:
+    - cd OWASP_JuiceShop
+    - mkdir -p report
+    - gitleaks detect --source . -r report/gitleaks-report.json -f json || true
+
+  artifacts:
+    when: always
+
+    paths:
+      - OWASP_JuiceShop/report/gitleaks-report.json
+
+  allow_failure: true
+
+JuiceShop_sca_package:
+  stage: sca-package
+  image: node:20
+  cache:
+    paths:
+      - .npm/
+  script:
+    - cd OWASP_JuiceShop
+    - npm install --cache ../.npm --prefer-offline
+    - npm run sbom
+    - npm audit --json > audit-report.json || true
+    - npm audit > audit-report.txt || true
+  artifacts:
+    paths:
+      - OWASP_JuiceShop/bom.json
+      - OWASP_JuiceShop/audit-report.json
+      - OWASP_JuiceShop/audit-report.txt
+
+JuiceShop_sca_container:
+  stage: sca-container
+
+  image:
+    name: aquasec/trivy:latest
+    entrypoint: [""]
+
+  script:
+    - trivy fs --format json -o trivy-report.json OWASP_JuiceShop
+    - trivy fs OWASP_JuiceShop > trivy-report.txt
+
+  artifacts:
+    when: always
+
+    paths:
+      - trivy-report.json
+      - trivy-report.txt
+
+  allow_failure: true
+
+JuiceShop_publish_container:
+  stage: publish
+  image: docker:24
+  services:
+    - docker:24-dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+    IMAGE_TAG_SLUG:   $CI_REGISTRY_IMAGE/juiceshop:$CI_COMMIT_REF_SLUG
+    IMAGE_TAG_SHA:    $CI_REGISTRY_IMAGE/juiceshop:$CI_COMMIT_SHA
+    IMAGE_TAG_LATEST: $CI_REGISTRY_IMAGE/juiceshop:latest
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - |
+      docker build \
+        --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+        --build-arg VCS_REF=$CI_COMMIT_SHORT_SHA \
+        -t $IMAGE_TAG_SLUG \
+        -t $IMAGE_TAG_SHA \
+        -t $IMAGE_TAG_LATEST \
+        ./OWASP_JuiceShop
+    - docker push $IMAGE_TAG_SLUG
+    - docker push $IMAGE_TAG_SHA
+    - docker push $IMAGE_TAG_LATEST
+  allow_failure: true
+
+JuiceShop_auto_deploy:
+  stage: deploy
+
+  image: alpine:latest
+
+  needs:
+    - JuiceShop_publish_container
+
+  before_script:
+    - apk add --no-cache openssh-client
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+    - chmod 600 ~/.ssh/id_ed25519
+    - ssh-keyscan -H $SSH_IP >> ~/.ssh/known_hosts
+
+  script:
+    - |
+      ssh $SSH_USER@$SSH_IP << EOF | tee deploy.log
+      docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+      docker pull $CI_REGISTRY_IMAGE/juiceshop:latest
+
+      docker stop juiceshop || true
+      docker rm juiceshop || true
+
+      docker run -d \
+        --name juiceshop \
+        -p 3000:3000 \
+        --restart unless-stopped \
+        $CI_REGISTRY_IMAGE/juiceshop:latest
+
+      docker ps
+
+      EOF
+
+  artifacts:
+    when: always
+    paths:
+      - deploy.log
+
+  allow_failure: false
+
+JuiceShop_dast-zap:
+  stage: dast
+  image:
+    name: ghcr.io/zaproxy/zaproxy:stable
+    entrypoint: [""]
+  variables:
+    ZAP_TARGET: "http://$SSH_IP:3000"
+  needs:
+    - job: JuiceShop_auto_deploy
+  script:
+    - mkdir -p /zap/wrk OWASP_JuiceShop/report
+    - zap-full-scan.py -t $ZAP_TARGET -J zap-report.json -r zap-report.html -l WARN || true
+    - cp /zap/wrk/zap-report.* OWASP_JuiceShop/report/
+  artifacts:
+    when: always
+    paths:
+      - OWASP_JuiceShop/report/zap-report.json
+      - OWASP_JuiceShop/report/zap-report.html
+  allow_failure: true

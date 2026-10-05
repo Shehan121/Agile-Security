@@ -1,0 +1,81 @@
+# Sends every security report from the ToDo List and Juice Shop pipelines to
+# the Vulnerability Dashboard (POST /vulnerabilities).
+#
+# Each report is converted with jq to the dashboard's ingest format, using the
+# app and tool names its filters expect. A report that is missing or empty is
+# skipped, so the dashboard keeps that tool's previous results.
+
+report_to_dashboard:
+  stage: report
+  image: alpine:latest
+  when: always
+
+  variables:
+    DASHBOARD_URL: "http://$SSH_IP:3001"
+
+  needs:
+    - { job: todolist_semgrep_sast,     artifacts: true, optional: true }
+    - { job: todolist_gitleaks_sast,    artifacts: true, optional: true }
+    - { job: todolist_sca_package,      artifacts: true, optional: true }
+    - { job: todolist_sca_container,    artifacts: true, optional: true }
+    - { job: todolist_dast-zap,         artifacts: true, optional: true }
+    - { job: JuiceShop_semgrep-sast,    artifacts: true, optional: true }
+    - { job: JuiceShop_gitleaks-report, artifacts: true, optional: true }
+    - { job: JuiceShop_sca_package,     artifacts: true, optional: true }
+    - { job: JuiceShop_sca_container,   artifacts: true, optional: true }
+    - { job: JuiceShop_dast-zap,        artifacts: true, optional: true }
+    - { job: deploy,                    artifacts: false, optional: true }
+
+  before_script:
+    - apk add --no-cache curl jq
+
+  script:
+    - |
+      SEMGREP='[.vulnerabilities[]? |
+        {severity: (.severity | ascii_upcase | if . == "INFO" or . == "UNKNOWN" then "LOW" else . end),
+         title: (.identifiers[0].value // .name // .message),
+         description: (.description // .message // ""),
+         file_path: "\(.location.file):\(.location.start_line)"}]'
+
+      GITLEAKS='[.[]? | {severity: "HIGH", title: .RuleID, description: .Description, file_path: "\(.File):\(.StartLine)"}]'
+
+      DEPCHECK='[.dependencies[]? | .fileName as $f | .vulnerabilities[]? |
+        {severity: (.severity | ascii_upcase | if . == "MODERATE" then "MEDIUM" else . end),
+         title: .name, description: (.description // "")[0:500], file_path: $f}]'
+
+      NPM_AUDIT='[(.vulnerabilities // {}) | to_entries[] |
+        {severity: (.value.severity | ascii_upcase | if . == "MODERATE" then "MEDIUM" elif . == "INFO" then "LOW" else . end),
+         title: .key,
+         description: ([.value.via[] | objects | "\(.title) \(.url // "")"] | join("; ")),
+         file_path: "package.json"}]'
+
+      TRIVY='[.Results[]? | .Target as $t | .Vulnerabilities[]? |
+        {severity: .Severity, title: .VulnerabilityID,
+         description: "\(.PkgName) \(.InstalledVersion): \(.Title // "")", file_path: $t}]'
+
+      ZAP='[.site[]?.alerts[]? |
+        {severity: (.riskdesc | split(" ")[0] | ascii_upcase | if . == "INFORMATIONAL" then "LOW" else . end),
+         title: .name, description: (.desc | gsub("<[^>]*>"; ""))[0:500], file_path: (.instances[0].uri // "")}]'
+
+      post() {
+        app=$1; tool=$2; file=$3; filter=$4
+        if [ ! -s "$file" ]; then echo "skip $app/$tool: no $file"; return; fi
+        jq "$filter" "$file" \
+          | jq --arg app "$app" --arg tool "$tool" --arg run "pipeline-$CI_PIPELINE_ID" \
+              '{app: $app, tool: $tool, run_id: $run, vulnerabilities: .}' \
+          | curl -sS --fail -X POST -H 'Content-Type: application/json' --data @- "$DASHBOARD_URL/vulnerabilities" \
+          || echo "warn: posting $app/$tool to $DASHBOARD_URL failed"
+        echo
+      }
+
+      post Todolist  Semgrep        todolist/target/surefire-reports/gl-sast-report.json   "$SEMGREP"
+      post Todolist  Gitleaks       todolist/target/surefire-reports/gitleaks-report.json  "$GITLEAKS"
+      post Todolist  OWASP-DepCheck todolist/target/dependency-check-report.json           "$DEPCHECK"
+      post Todolist  Trivy          todolist/report/trivy-report.json                      "$TRIVY"
+      post Todolist  OWASP-ZAP      todolist/report/zap-report.json                        "$ZAP"
+
+      post JuiceShop Semgrep        OWASP_JuiceShop/report/gl-sast-report.json             "$SEMGREP"
+      post JuiceShop Gitleaks       OWASP_JuiceShop/report/gitleaks-report.json            "$GITLEAKS"
+      post JuiceShop npm-audit      OWASP_JuiceShop/audit-report.json                      "$NPM_AUDIT"
+      post JuiceShop Trivy          trivy-report.json                                      "$TRIVY"
+      post JuiceShop OWASP-ZAP      OWASP_JuiceShop/report/zap-report.json                 "$ZAP"
